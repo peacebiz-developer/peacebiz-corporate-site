@@ -78,7 +78,7 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="flex items-center gap-4 mb-8">
               {/* Logo */}
-              <img src="/logo.png" alt="Peace Biz Logo" className="h-10 md:h-14 w-auto object-contain" />
+              <img src={`${process.env.PUBLIC_URL || ""}/logo.png`} alt="Peace Biz Logo" className="h-10 md:h-14 w-auto object-contain" />
               <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-black dark:text-white">
                 Peace Biz Inc.
               </h2>

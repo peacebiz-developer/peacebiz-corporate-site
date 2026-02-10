@@ -30,7 +30,7 @@ export const Preloader = () => {
                             transition={{ duration: 2, ease: "easeInOut" }}
                             className="mb-8"
                         >
-                            <img src="/logo.png" alt="Peace Biz" className="w-24 md:w-32 invert brightness-0 invert" />
+                            <img src={`${process.env.PUBLIC_URL || ""}/logo.png`} alt="Peace Biz" className="w-24 md:w-32 invert brightness-0 invert" />
                         </motion.div>
 
                         <div className="h-[1px] w-32 bg-white/10 rounded-full overflow-hidden">

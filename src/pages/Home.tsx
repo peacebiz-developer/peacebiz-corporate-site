@@ -39,7 +39,7 @@ const Home: React.FC = () => {
             className="w-full h-full object-cover"
           >
             {/* Custom Background Video */}
-            <source src="/herosection_background.mp4" type="video/mp4" />
+            <source src={`${process.env.PUBLIC_URL || ""}/herosection_background.mp4`} type="video/mp4" />
           </video>
         </motion.div>
 
