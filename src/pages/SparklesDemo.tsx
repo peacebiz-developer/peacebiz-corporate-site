@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { SparklesPreview, SparklesPreviewDark, SparklesPreviewColorful } from '../components/ui/sparkles-demo';
 import { PeaceBizSparkles, HeroSparkles, ServicesSparkles, ContactSparkles } from '../components/ui/peacebiz-sparkles';
 import { Button } from '../components/ui/button';

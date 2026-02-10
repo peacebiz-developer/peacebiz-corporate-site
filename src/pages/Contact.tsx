@@ -1,12 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { motion, useScroll } from 'framer-motion';
-import { Phone, Send, CheckCircle } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Mail, Phone, MapPin, Send, CheckCircle, ArrowRight } from 'lucide-react';
 import { Button, Checkbox } from "@nextui-org/react";
+import { TextReveal } from '../components/ui/TextReveal';
 import { MagneticButton } from '../components/ui/MagneticButton';
 
 const Contact: React.FC = () => {
   const containerRef = useRef(null);
-  useScroll({
+  const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
@@ -315,7 +316,7 @@ const Contact: React.FC = () => {
             <div className="flex items-center gap-3">
               <Checkbox defaultSelected size="sm" color="default">
                 <span className="text-sm text-gray-500">
-                  <a href="https://www.peace-biz.com/privacy" className="underline hover:text-black">プライバシーポリシー</a> に同意します
+                  <a href="#" className="underline hover:text-black">プライバシーポリシー</a> に同意します
                 </span>
               </Checkbox>
             </div>

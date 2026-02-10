@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Wifi, Phone, Printer, CheckCircle2 } from 'lucide-react';
+import { Building2, Wifi, Phone, Printer, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@nextui-org/react";
 import { ParallaxImage } from '../../components/ui/ParallaxImage';

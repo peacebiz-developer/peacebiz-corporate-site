@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, X, ArrowRight } from 'lucide-react';
+import { Button, Chip } from "@nextui-org/react";
 import { MaskTextReveal } from '../components/ui/MaskTextReveal';
 import { ParallaxImage } from '../components/ui/ParallaxImage';
+import { MagneticButton } from '../components/ui/MagneticButton';
 
 // Mock Data
 const worksData = [

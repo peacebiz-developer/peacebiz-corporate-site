@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Monitor, Leaf, Building2, ArrowRight } from 'lucide-react';
 import { Button } from "@nextui-org/react";
 import { Link } from 'react-router-dom';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sun, Zap, Wind, CheckCircle2 } from 'lucide-react';
+import { Leaf, Sun, Zap, Wind, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@nextui-org/react";
 import { ParallaxImage } from '../../components/ui/ParallaxImage';

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, Star, Zap, Heart } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, Check, Star, Zap, Heart } from 'lucide-react';
 import { Button } from "@nextui-org/react";
 import { Link } from 'react-router-dom';
 import { MagneticButton } from '../components/ui/MagneticButton';
@@ -9,6 +9,10 @@ import { ParallaxImage } from '../components/ui/ParallaxImage';
 
 const Recruit: React.FC = () => {
   const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
 
   return (
     <div ref={containerRef} className="min-h-screen bg-white dark:bg-black text-black dark:text-white">

@@ -1,10 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Monitor, Cpu, Lock, CheckCircle2 } from 'lucide-react';
+import { Monitor, Cpu, Network, Lock, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@nextui-org/react";
 import { ParallaxImage } from '../../components/ui/ParallaxImage';
 import { MaskTextReveal } from '../../components/ui/MaskTextReveal';
+import { MagneticButton } from '../../components/ui/MagneticButton';
 
 const PrimeSign: React.FC = () => {
     return (
