@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { motion, useScroll } from 'framer-motion';
+import { motion, useScroll } from 'motion/react';
 import { Phone, Send, CheckCircle } from 'lucide-react';
 import { Button, Checkbox } from "@nextui-org/react";
 import { MagneticButton } from '../components/ui/MagneticButton';
@@ -45,9 +45,9 @@ const Contact: React.FC = () => {
       color: 'text-brand-green',
       items: [
         { key: 'aircon', label: '業務用空調機器' },
-        { key: 'new-power', label: '厨房機器' },
-        { key: 'energy-saving', label: '太陽光発電システム' },
-        { key: 'energy-saving', label: '新電力' }
+        { key: 'kitchen-equipment', label: '厨房機器' },
+        { key: 'solar-power', label: '太陽光発電システム' },
+        { key: 'new-power', label: '新電力' }
       ],
     },
     office: {
@@ -82,13 +82,45 @@ const Contact: React.FC = () => {
     },
   ];
 
+  const [submitError, setSubmitError] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    setSubmitError('');
+
+    try {
+      const submitData = new FormData();
+      submitData.append("access_key", "427cb386-92ed-42de-8e05-44b7e7ee7ac0");
+      submitData.append("subject", `【Peace Biz】お問い合わせ: ${inquiryTypes.find(t => t.key === formData.inquiryType)?.label || 'その他'}`);
+      submitData.append("name", formData.name);
+      submitData.append("email", formData.email);
+      if (formData.company) submitData.append("company", formData.company);
+      if (formData.phone) submitData.append("phone", formData.phone);
+      submitData.append("inquiry_type", inquiryTypes.find(t => t.key === formData.inquiryType)?.label || '');
+      if (formData.services.length > 0) {
+        submitData.append("services", formData.services.join(', '));
+      }
+      submitData.append("message", formData.message);
+
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: submitData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsSubmitted(true);
+        window.scrollTo(0, 0);
+      } else {
+        setSubmitError('送信に失敗しました。もう一度お試しください。');
+      }
+    } catch {
+      setSubmitError('通信エラーが発生しました。ネットワーク接続を確認してください。');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const showServiceOptions = formData.inquiryType === 'service';
@@ -331,6 +363,9 @@ const Contact: React.FC = () => {
                   送信<Send className="ml-4 w-5 h-5" />
                 </Button>
               </MagneticButton>
+              {submitError && (
+                <p className="mt-4 text-red-500 font-medium text-sm">{submitError}</p>
+              )}
             </div>
 
           </form>

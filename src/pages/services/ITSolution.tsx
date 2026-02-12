@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { Monitor, Cpu, Lock, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@nextui-org/react";
@@ -23,16 +23,17 @@ const ITSolution: React.FC = () => {
             title: 'Prime Sign',
             desc: '次世代型特殊フィルムと映像技術を組み合わせた、新時代の集客ソリューション。透過型ディスプレイにより、窓ガラスそのものを高精細なスクリーンへ変貌させます。圧倒的な没入感でブランド体験を向上させ、通行人の視線を確実にキャッチ。店舗の「顔」を、テクノロジーで進化させます。',
             icon: Monitor,
-            img: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2070&auto=format&fit=crop',
-            highlights: ['透過型ディスプレイ', 'リモートコンテンツ管理', 'AI連動コンテンツ配信']
+            img: `${process.env.PUBLIC_URL || ''}/primesign.webp`,
+            highlights: ['透過型ディスプレイ', 'リモートコンテンツ管理', 'AI連動コンテンツ配信'],
+            link: 'https://prime-sign.jp',
         },
         {
             num: '02',
             title: 'LED Vision',
             desc: '屋内外を問わず設置可能な高精細LEDビジョン。視認性の高い大画面映像で、効果的な情報発信とブランディングを実現。商業施設、イベント会場、オフィスエントランスなど、あらゆるシーンに最適なサイズと仕様をご提案します。',
             icon: Cpu,
-            img: 'https://images.unsplash.com/photo-1563986768609-322da13575f2?q=80&w=2070&auto=format&fit=crop',
-            highlights: ['屋内外対応', '高輝度・高精細', 'カスタムサイズ対応']
+            img: `${process.env.PUBLIC_URL || ''}/ledvision.webp`,
+            highlights: ['屋内外対応', '高輝度・高精細', 'カスタムサイズ対応'],
         },
         {
             num: '03',
@@ -40,7 +41,7 @@ const ITSolution: React.FC = () => {
             desc: '顔認証や行動分析を備えた最先端のAIカメラシステム。防犯・セキュリティだけでなく、来店者の属性分析や動線解析など、マーケティングデータとしても活用可能。安全と経営改善を同時に実現する、次世代の防犯ソリューションです。',
             icon: Lock,
             img: 'https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=2070&auto=format&fit=crop',
-            highlights: ['顔認証システム', '行動分析AI', 'マーケティング連携']
+            highlights: ['顔認証システム', '行動分析AI', 'マーケティング連携'],
         }
     ];
 
@@ -62,11 +63,22 @@ const ITSolution: React.FC = () => {
                     <ParallaxImage
                         src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop"
                         alt="IT Solution Hero"
-                        className="w-full h-full object-cover brightness-[0.3]"
+                        className="w-full h-full object-cover"
                     />
                 </div>
+                {/* Bottom gradient for text readability */}
+                <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                {/* Noise texture overlay */}
+                <div
+                    className="absolute inset-0 z-[1]"
+                    style={{
+                        opacity: 0.15,
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                        backgroundSize: '128px 128px',
+                    }}
+                />
                 {/* Grid overlay */}
-                <div className="absolute inset-0 z-[1] opacity-10">
+                <div className="absolute inset-0 z-[2] opacity-10">
                     <div className="absolute left-1/4 top-0 w-px h-full bg-white" />
                     <div className="absolute left-2/4 top-0 w-px h-full bg-white" />
                     <div className="absolute left-3/4 top-0 w-px h-full bg-white" />
@@ -211,9 +223,16 @@ const ITSolution: React.FC = () => {
                                                     </span>
                                                 ))}
                                             </div>
-                                            <div className="flex items-center text-sm font-bold tracking-widest uppercase text-brand-blue hover:translate-x-2 transition-transform cursor-pointer">
-                                                View more <ArrowRight className="ml-2 w-4 h-4" />
-                                            </div>
+                                            {service.link && (
+                                                <a
+                                                    href={service.link}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center text-sm font-bold tracking-widest uppercase text-brand-blue hover:translate-x-2 transition-transform cursor-pointer"
+                                                >
+                                                    View more <ArrowRight className="ml-2 w-4 h-4" />
+                                                </a>
+                                            )}
                                         </motion.div>
                                     </div>
                                 </div>

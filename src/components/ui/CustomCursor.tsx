@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, useMotionValue } from 'framer-motion';
+import { motion, useMotionValue } from 'motion/react';
 
 export const CustomCursor = () => {
     const mouseX = useMotionValue(0);
@@ -7,6 +7,11 @@ export const CustomCursor = () => {
     const [isHovering, setIsHovering] = useState(false);
 
     useEffect(() => {
+        const canUseCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches;
+        if (!canUseCustomCursor) {
+            return;
+        }
+
         const updateMousePosition = (e: MouseEvent) => {
             mouseX.set(e.clientX);
             mouseY.set(e.clientY);
@@ -38,7 +43,7 @@ export const CustomCursor = () => {
 
     return (
         <motion.div
-            className="fixed top-0 left-0 w-4 h-4 bg-primary rounded-full pointer-events-none z-[10000] mix-blend-difference hidden md:block"
+            className="fixed top-0 left-0 w-4 h-4 bg-brand-blue/80 rounded-full pointer-events-none z-[10000] hidden md:block shadow-[0_0_8px_rgba(0,107,182,0.5)]"
             style={{
                 x: mouseX,
                 y: mouseY,

@@ -1,6 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Wifi, Phone, Printer, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Wifi, Phone, Printer, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@nextui-org/react";
 import { ParallaxImage } from '../../components/ui/ParallaxImage';
@@ -20,7 +20,7 @@ const OfficeSolution: React.FC = () => {
     const services = [
         {
             num: '01',
-            title: 'Infrastructure',
+            title: 'オフィスインフラ',
             desc: '光回線の手配から、安定したWi-Fi環境の構築、LAN配線工事まで。ビジネスの根幹を支えるネットワークの基盤を、確実に整えます。オフィス移転やリニューアルに伴う通信環境の設計から施工、運用開始後のサポートまで、ワンストップで対応。快適で途切れない接続環境を実現します。',
             icon: Wifi,
             img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop',
@@ -28,7 +28,7 @@ const OfficeSolution: React.FC = () => {
         },
         {
             num: '02',
-            title: 'OA Devices',
+            title: 'OA機器',
             desc: '最新の複合機（コピー機）やビジネスフォンをご提案。業務内容や規模に合わせた最適な機種選定で、ランニングコストの大幅削減に貢献します。リース契約の見直しから、保守・メンテナンスプランの設計まで、お客様の業務効率を最大化するためのトータルサポートを提供。',
             icon: Printer,
             img: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop',
@@ -36,7 +36,7 @@ const OfficeSolution: React.FC = () => {
         },
         {
             num: '03',
-            title: 'Support',
+            title: '保守サポート',
             desc: 'トラブル時の迅速な対応はもちろん、定期的なメンテナンスで、業務を止めない安心のサポート体制を提供します。専任の担当者が、お客様のオフィス環境を常にベストな状態に保ちます。ITに関するあらゆるお悩みを、気軽にご相談いただけるパートナーとして。',
             icon: Phone,
             img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2070&auto=format&fit=crop',
@@ -63,11 +63,22 @@ const OfficeSolution: React.FC = () => {
                     <ParallaxImage
                         src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop"
                         alt="Office Solution Hero"
-                        className="w-full h-full object-cover brightness-[0.3]"
+                        className="w-full h-full object-cover"
                     />
                 </div>
+                {/* Bottom gradient for text readability */}
+                <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                {/* Noise texture overlay */}
+                <div
+                    className="absolute inset-0 z-[1]"
+                    style={{
+                        opacity: 0.15,
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                        backgroundSize: '128px 128px',
+                    }}
+                />
                 {/* Grid overlay */}
-                <div className="absolute inset-0 z-[1] opacity-10">
+                <div className="absolute inset-0 z-[2] opacity-10">
                     <div className="absolute left-1/4 top-0 w-px h-full bg-white" />
                     <div className="absolute left-2/4 top-0 w-px h-full bg-white" />
                     <div className="absolute left-3/4 top-0 w-px h-full bg-white" />
@@ -210,9 +221,6 @@ const OfficeSolution: React.FC = () => {
                                                         {highlight}
                                                     </span>
                                                 ))}
-                                            </div>
-                                            <div className="flex items-center text-sm font-bold tracking-widest uppercase text-brand-orange hover:translate-x-2 transition-transform cursor-pointer">
-                                                View more <ArrowRight className="ml-2 w-4 h-4" />
                                             </div>
                                         </motion.div>
                                     </div>

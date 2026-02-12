@@ -1,6 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Sun, Zap, Wind, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Sun, Zap, Wind, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@nextui-org/react";
 import { ParallaxImage } from '../../components/ui/ParallaxImage';
@@ -20,7 +20,7 @@ const EcoSolution: React.FC = () => {
     const services = [
         {
             num: '01',
-            title: 'Solar Power',
+            title: '太陽光発電システム',
             desc: '屋根や遊休地を活用した自家消費型太陽光発電システム。電力コストの大幅削減と災害時のBCP対策を同時に実現します。初期投資の回収シミュレーションから、施工、運用後のメンテナンスまで、長期的な視点でお客様のエネルギー戦略をサポート。企業の持続的な成長を、エネルギーの側面から支えます。',
             icon: Sun,
             img: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=2070&auto=format&fit=crop',
@@ -28,18 +28,18 @@ const EcoSolution: React.FC = () => {
         },
         {
             num: '02',
-            title: 'Energy Saving',
-            desc: '最新の業務用エアコンやLED照明への入れ替えで、消費電力を最大限に抑制。快適性を損なわず省エネを実現します。施設全体のエネルギー消費を可視化し、最も効果的な改善ポイントを特定。無駄のない投資で、大きなリターンを生み出します。',
+            title: '業務用エアコン／厨房機器',
+            desc: '最新の業務用エアコンや厨房機器の入れ替えで、消費電力を抑制し、環境効果を最大化します。快適性を損なわず省エネを実現します。施設全体のエネルギー消費を可視化し、最も効果的な改善ポイントを特定。無駄のない投資で、大きなリターンを生み出します。',
             icon: Wind,
-            img: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?q=80&w=2070&auto=format&fit=crop',
-            highlights: ['業務用エアコン更新', 'LED照明工事', 'エネルギー可視化']
+            img: `${process.env.PUBLIC_URL || ''}/air-conditioner.webp`,
+            highlights: ['業務用エアコン入替', '厨房機器', 'エネルギー可視化', '節電・環境効果']
         },
         {
             num: '03',
-            title: 'Power Supply',
+            title: '新電力',
             desc: '新電力（PPS）への切り替えによる電気料金の見直し。初期費用ゼロで、毎月の固定費を削減します。お客様の電力使用パターンを詳細に分析し、最適な料金プランをご提案。面倒な手続きはすべて私たちが代行し、スムーズな移行をサポートします。',
             icon: Zap,
-            img: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=2070&auto=format&fit=crop',
+            img: `${process.env.PUBLIC_URL || ''}/new-electricity-retailer.webp`,
             highlights: ['新電力切り替え', '初期費用ゼロ', '電力コスト分析']
         }
     ];
@@ -63,11 +63,22 @@ const EcoSolution: React.FC = () => {
                     <ParallaxImage
                         src="https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=2070&auto=format&fit=crop"
                         alt="Eco Solution Hero"
-                        className="w-full h-full object-cover brightness-[0.3]"
+                        className="w-full h-full object-cover"
                     />
                 </div>
+                {/* Bottom gradient for text readability */}
+                <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                {/* Noise texture overlay */}
+                <div
+                    className="absolute inset-0 z-[1]"
+                    style={{
+                        opacity: 0.15,
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                        backgroundSize: '128px 128px',
+                    }}
+                />
                 {/* Grid overlay */}
-                <div className="absolute inset-0 z-[1] opacity-10">
+                <div className="absolute inset-0 z-[2] opacity-10">
                     <div className="absolute left-1/4 top-0 w-px h-full bg-white" />
                     <div className="absolute left-2/4 top-0 w-px h-full bg-white" />
                     <div className="absolute left-3/4 top-0 w-px h-full bg-white" />
@@ -210,9 +221,6 @@ const EcoSolution: React.FC = () => {
                                                         {highlight}
                                                     </span>
                                                 ))}
-                                            </div>
-                                            <div className="flex items-center text-sm font-bold tracking-widest uppercase text-brand-green hover:translate-x-2 transition-transform cursor-pointer">
-                                                View more <ArrowRight className="ml-2 w-4 h-4" />
                                             </div>
                                         </motion.div>
                                     </div>

@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="flex items-center gap-4 mb-8">
               {/* Logo */}
-              <img src={`${process.env.PUBLIC_URL || ""}/logo.png`} alt="Peace Biz Logo" className="h-10 md:h-14 w-auto object-contain" />
+              <img src={`${process.env.PUBLIC_URL || ""}/logo.png`} alt="Peace Biz Logo" loading="lazy" decoding="async" className="h-10 md:h-14 w-auto object-contain" />
               <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-black dark:text-white">
                 Peace Biz Inc.
               </h2>
@@ -64,15 +64,14 @@ const Footer: React.FC = () => {
               <li><Link to="/about" className="hover:text-brand-blue transition-colors">About Us</Link></li>
               <li><Link to="/services" className="hover:text-brand-blue transition-colors">Services</Link></li>
               <li><Link to="/works" className="hover:text-brand-blue transition-colors">Works</Link></li>
+              <li><Link to="/news" className="hover:text-brand-blue transition-colors">News</Link></li>
               <li><Link to="/recruit" className="hover:text-brand-blue transition-colors">Recruit</Link></li>
             </ul>
           </div>
           <div className="col-span-1">
             <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-8">Social</h4>
             <ul className="space-y-4 font-bold text-lg">
-              <li><a href="https://www.facebook.com/" target="_blank" rel="noreferrer" className="hover:text-brand-orange transition-colors">Facebook</a></li>
-              <li><a href="https://x.com/" target="_blank" rel="noreferrer" className="hover:text-brand-orange transition-colors">X (Twitter)</a></li>
-              <li><a href="https://www.instagram.com/" target="_blank" rel="noreferrer" className="hover:text-brand-orange transition-colors">Instagram</a></li>
+              <li><a href="https://youtube.com/@peacebiz?si=8zAwqGp1JJjAx77X" target="_blank" rel="noreferrer" className="hover:text-brand-orange transition-colors">YouTube</a></li>
             </ul>
           </div>
         </div>

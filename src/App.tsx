@@ -1,18 +1,8 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
-import Home from './pages/Home';
-import About from './pages/About';
-import Services from './pages/Services';
-import ITSolution from './pages/services/ITSolution';
-import EcoSolution from './pages/services/EcoSolution';
-import OfficeSolution from './pages/services/OfficeSolution';
-import Works from './pages/Works';
-import Contact from './pages/Contact';
-import Recruit from './pages/Recruit';
-import SparklesDemo from './pages/SparklesDemo';
 import './App.css';
 
 import { SmoothScroll } from './components/ui/SmoothScroll';
@@ -24,11 +14,46 @@ import ScrollToTop from './components/utils/ScrollToTop';
 
 import { GridBackground } from './components/layout/GridBackground';
 
+const Top = lazy(() => import('./pages/Top'));
+const About = lazy(() => import('./pages/About'));
+const Services = lazy(() => import('./pages/Services'));
+const ITSolution = lazy(() => import('./pages/services/ITSolution'));
+const EcoSolution = lazy(() => import('./pages/services/EcoSolution'));
+const OfficeSolution = lazy(() => import('./pages/services/OfficeSolution'));
+const Works = lazy(() => import('./pages/Works'));
+const News = lazy(() => import('./pages/News'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Recruit = lazy(() => import('./pages/Recruit'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const SparklesDemo = lazy(() => import('./pages/SparklesDemo'));
+
+const normalizeBasename = (publicUrl: string): string => {
+  if (!publicUrl) return '';
+
+  const path = publicUrl.startsWith('http')
+    ? new URL(publicUrl).pathname
+    : publicUrl;
+  const normalized = path.replace(/\/+$/, '');
+
+  return normalized === '/' ? '' : normalized;
+};
+
+const routeWithTransition = (node: React.ReactNode, withTopPadding = true) => (
+  withTopPadding ? (
+    <div className="pt-24">
+      <PageTransition>{node}</PageTransition>
+    </div>
+  ) : (
+    <PageTransition>{node}</PageTransition>
+  )
+);
+
 const App: React.FC = () => {
   const publicUrl = process.env.PUBLIC_URL || '';
+  const routerBasename = normalizeBasename(publicUrl);
 
   return (
-    <Router basename={publicUrl}>
+    <Router basename={routerBasename}>
       <ScrollToTop />
       <Preloader />
       <SmoothScroll />
@@ -43,20 +68,24 @@ const App: React.FC = () => {
         <Header />
 
         <main>
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-              <Route path="/about" element={<div className="pt-24"><PageTransition><About /></PageTransition></div>} />
-              <Route path="/services" element={<div className="pt-24"><PageTransition><Services /></PageTransition></div>} />
-              <Route path="/services/it-solution" element={<div className="pt-24"><PageTransition><ITSolution /></PageTransition></div>} />
-              <Route path="/services/eco-solution" element={<div className="pt-24"><PageTransition><EcoSolution /></PageTransition></div>} />
-              <Route path="/services/office-solution" element={<div className="pt-24"><PageTransition><OfficeSolution /></PageTransition></div>} />
-              <Route path="/works" element={<div className="pt-24"><PageTransition><Works /></PageTransition></div>} />
-              <Route path="/contact" element={<div className="pt-24"><PageTransition><Contact /></PageTransition></div>} />
-              <Route path="/recruit" element={<div className="pt-24"><PageTransition><Recruit /></PageTransition></div>} />
-              <Route path="/sparkles-demo" element={<PageTransition><SparklesDemo /></PageTransition>} />
-            </Routes>
-          </AnimatePresence>
+          <Suspense fallback={null}>
+            <AnimatePresence mode="wait">
+              <Routes>
+                <Route path="/" element={routeWithTransition(<Top />, false)} />
+                <Route path="/about" element={routeWithTransition(<About />)} />
+                <Route path="/services" element={routeWithTransition(<Services />)} />
+                <Route path="/services/it-solution" element={routeWithTransition(<ITSolution />)} />
+                <Route path="/services/eco-solution" element={routeWithTransition(<EcoSolution />)} />
+                <Route path="/services/office-solution" element={routeWithTransition(<OfficeSolution />)} />
+                <Route path="/works" element={routeWithTransition(<Works />)} />
+                <Route path="/news" element={routeWithTransition(<News />)} />
+                <Route path="/contact" element={routeWithTransition(<Contact />)} />
+                <Route path="/recruit" element={routeWithTransition(<Recruit />, false)} />
+                <Route path="/privacy" element={routeWithTransition(<Privacy />)} />
+                <Route path="/sparkles-demo" element={routeWithTransition(<SparklesDemo />, false)} />
+              </Routes>
+            </AnimatePresence>
+          </Suspense>
         </main>
 
         <Footer />
