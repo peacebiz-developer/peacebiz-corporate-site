@@ -81,7 +81,7 @@ const Footer: React.FC = () => {
           <p>© {currentYear} Peace Biz Inc.</p>
           <div className="flex gap-8 mt-4 md:mt-0">
             <Link to="/privacy" className="hover:text-black dark:hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-black dark:hover:text-white transition-colors">Site Policy</Link>
+            <Link to="/sitepolicy" className="hover:text-black dark:hover:text-white transition-colors">Site Policy</Link>
           </div>
         </div>
       </div>

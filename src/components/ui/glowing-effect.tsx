@@ -2,7 +2,7 @@
 
 import { memo, useCallback, useEffect, useRef } from "react";
 import { cn } from "../../utils/cn";
-import { animate } from "motion/react";
+import { animate, useInView } from "motion/react";
 
 interface GlowingEffectProps {
   blur?: number;
@@ -33,7 +33,16 @@ const GlowingEffect = memo(
     const containerRef = useRef<HTMLDivElement>(null);
     const lastPosition = useRef({ x: 0, y: 0 });
     const animationFrameRef = useRef<number>(0);
+    const scrollRafRef = useRef<number | null>(null);
     const angleAnimationRef = useRef<ReturnType<typeof animate> | null>(null);
+    const rectRef = useRef<DOMRect | null>(null);
+    const isActiveRef = useRef(false);
+    const isInView = useInView(containerRef, { margin: "200px 0px" });
+
+    const updateRect = useCallback(() => {
+      if (!containerRef.current) return;
+      rectRef.current = containerRef.current.getBoundingClientRect();
+    }, []);
 
     const handleMove = useCallback(
       (e?: MouseEvent | { x: number; y: number }) => {
@@ -47,7 +56,9 @@ const GlowingEffect = memo(
           const element = containerRef.current;
           if (!element) return;
 
-          const { left, top, width, height } = element.getBoundingClientRect();
+          const rect = rectRef.current;
+          if (!rect) return;
+          const { left, top, width, height } = rect;
           const mouseX = e?.x ?? lastPosition.current.x;
           const mouseY = e?.y ?? lastPosition.current.y;
 
@@ -64,6 +75,7 @@ const GlowingEffect = memo(
 
           if (distanceFromCenter < inactiveRadius) {
             element.style.setProperty("--active", "0");
+            isActiveRef.current = false;
             return;
           }
 
@@ -74,6 +86,7 @@ const GlowingEffect = memo(
             mouseY < top + height + proximity;
 
           element.style.setProperty("--active", isActive ? "1" : "0");
+          isActiveRef.current = isActive;
 
           if (!isActive) return;
 
@@ -85,6 +98,7 @@ const GlowingEffect = memo(
             90;
 
           const angleDiff = ((targetAngle - currentAngle + 180) % 360) - 180;
+          if (Math.abs(angleDiff) < 0.05) return;
           const newAngle = currentAngle + angleDiff;
 
           angleAnimationRef.current?.stop();
@@ -103,13 +117,47 @@ const GlowingEffect = memo(
     useEffect(() => {
       if (disabled) return;
       const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-      if (!canHover) return;
+      if (!canHover || !isInView) return;
 
-      const handleScroll = () => handleMove();
-      const handlePointerMove = (e: PointerEvent) => handleMove(e);
+      updateRect();
+
+      const handleScroll = () => {
+        if (scrollRafRef.current !== null) return;
+        scrollRafRef.current = requestAnimationFrame(() => {
+          scrollRafRef.current = null;
+          updateRect();
+          if (isActiveRef.current) {
+            handleMove();
+          }
+        });
+      };
+      const handlePointerMove = (e: PointerEvent) => {
+        const rect = rectRef.current;
+        if (!rect) return;
+
+        const threshold = Math.max(32, proximity);
+        const isNear =
+          e.clientX > rect.left - threshold &&
+          e.clientX < rect.right + threshold &&
+          e.clientY > rect.top - threshold &&
+          e.clientY < rect.bottom + threshold;
+
+        if (!isNear && !isActiveRef.current) {
+          return;
+        }
+
+        handleMove({ x: e.clientX, y: e.clientY });
+      };
+
+      let resizeObserver: ResizeObserver | null = null;
+      if (containerRef.current && "ResizeObserver" in window) {
+        resizeObserver = new ResizeObserver(updateRect);
+        resizeObserver.observe(containerRef.current);
+      }
 
       window.addEventListener("scroll", handleScroll, { passive: true });
-      document.body.addEventListener("pointermove", handlePointerMove, {
+      window.addEventListener("resize", updateRect, { passive: true });
+      window.addEventListener("pointermove", handlePointerMove, {
         passive: true,
       });
 
@@ -117,12 +165,18 @@ const GlowingEffect = memo(
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
         }
+        if (scrollRafRef.current !== null) {
+          cancelAnimationFrame(scrollRafRef.current);
+          scrollRafRef.current = null;
+        }
         angleAnimationRef.current?.stop();
         angleAnimationRef.current = null;
         window.removeEventListener("scroll", handleScroll);
-        document.body.removeEventListener("pointermove", handlePointerMove);
+        window.removeEventListener("resize", updateRect);
+        window.removeEventListener("pointermove", handlePointerMove);
+        resizeObserver?.disconnect();
       };
-    }, [handleMove, disabled]);
+    }, [handleMove, disabled, updateRect, proximity, isInView]);
 
     return (
       <>

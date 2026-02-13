@@ -1,53 +1,143 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { Button } from "@nextui-org/react";
 import { Link } from 'react-router-dom';
 import { MagneticButton } from '../components/ui/MagneticButton';
 import { MaskTextReveal } from '../components/ui/MaskTextReveal';
-import { BackgroundGradientAnimation } from '../components/ui/background-gradient-animation';
 import { DraggableCardBody, DraggableCardContainer } from '../components/ui/draggable-card';
 import { WobbleCard } from '../components/ui/wobble-card';
 
 const Recruit: React.FC = () => {
   const containerRef = useRef(null);
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  const heroVisibleRef = useRef(true);
+  const benefitsSectionRef = useRef<HTMLDivElement | null>(null);
+  const workStyleSectionRef = useRef<HTMLElement | null>(null);
+  const [showBenefitsCards, setShowBenefitsCards] = useState(false);
+  const [showWorkStyleCards, setShowWorkStyleCards] = useState(false);
+
+  useEffect(() => {
+    const video = heroVideoRef.current;
+    if (!video || !("IntersectionObserver" in window)) return;
+
+    const tryPlay = () => {
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => { });
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        heroVisibleRef.current = entry.isIntersecting && entry.intersectionRatio > 0.05;
+        if (heroVisibleRef.current) {
+          tryPlay();
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: [0, 0.05, 0.2] }
+    );
+
+    observer.observe(video);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        video.pause();
+      } else if (heroVisibleRef.current) {
+        tryPlay();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) {
+      setShowBenefitsCards(true);
+      setShowWorkStyleCards(true);
+      return;
+    }
+
+    const observers: IntersectionObserver[] = [];
+    const createObserver = (
+      element: Element | null,
+      onVisible: () => void,
+      rootMargin: string
+    ) => {
+      if (!element) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            onVisible();
+            observer.disconnect();
+          }
+        },
+        { rootMargin, threshold: 0.01 }
+      );
+      observer.observe(element);
+      observers.push(observer);
+    };
+
+    createObserver(benefitsSectionRef.current, () => setShowBenefitsCards(true), "500px 0px");
+    createObserver(workStyleSectionRef.current, () => setShowWorkStyleCards(true), "500px 0px");
+
+    return () => {
+      observers.forEach((observer) => observer.disconnect());
+    };
+  }, []);
 
   return (
     <div ref={containerRef} className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
 
-      {/* 1. HERO: Full Screen with Gradient Animation */}
+      {/* 1. HERO: Full Screen with Video Background */}
       <section className="relative h-screen w-full overflow-hidden">
-        <BackgroundGradientAnimation
-          containerClassName="absolute inset-0 h-full w-full"
-          interactive={false}
-        >
-          <div className="absolute z-50 inset-0 flex items-center justify-center px-6 md:px-20 pointer-events-none">
-            <div className="max-w-7xl mx-auto w-full">
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                <h2 className="text-sm md:text-base font-mono font-bold tracking-[0.2em] text-white/60 mb-8 uppercase">
-                  RECRUIT ― 採用ページ ―
-                </h2>
-                <h1 className="text-7xl md:text-9xl font-black mb-6 tracking-tighter leading-[0.8]">
-                  <span className="block bg-clip-text text-transparent drop-shadow-2xl bg-gradient-to-b from-white/90 to-white/30">
-                    RECRUIT
-                  </span>
-                </h1>
-                <p className="text-xl md:text-2xl text-white/60 max-w-xl leading-relaxed font-medium mt-10 drop-shadow-lg">
-                  未来を創る、<br />
-                  最短距離の挑戦。
-                </p>
-              </motion.div>
-            </div>
+        <div className="absolute inset-0 z-0">
+          <video
+            ref={heroVideoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            className="w-full h-full object-cover"
+          >
+            <source src={`${process.env.PUBLIC_URL || ''}/recruit-background.mp4`} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-black/45" />
+        </div>
+
+        <div className="absolute z-10 inset-0 flex items-center justify-center px-6 md:px-20 pointer-events-none">
+          <div className="max-w-7xl mx-auto w-full">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              <h2 className="text-sm md:text-base font-mono font-bold tracking-[0.2em] text-white/60 mb-8 uppercase">
+                株式会社ピース・ビズ　-　採用ページ
+              </h2>
+              <h1 className="text-7xl md:text-9xl font-black mb-6 tracking-tighter leading-[0.8]">
+                <span className="block bg-clip-text text-transparent drop-shadow-2xl bg-gradient-to-b from-white/90 to-white/30">
+                  RECRUIT
+                </span>
+              </h1>
+              <p className="text-xl md:text-2xl text-white/60 max-w-xl leading-relaxed font-medium mt-10 drop-shadow-lg">
+                未来を創る、<br />
+                最短距離の挑戦。
+              </p>
+            </motion.div>
           </div>
-        </BackgroundGradientAnimation>
+        </div>
       </section>
 
       {/* 2. MESSAGE: Big Statement */}
-      <section className="py-40 px-6 container mx-auto">
+      <section className="py-40 px-6 container mx-auto content-auto">
         <div className="max-w-5xl mx-auto">
           <p className="text-brand-blue font-bold tracking-widest uppercase mb-8">MESSAGE</p>
           <h2 className="text-4xl md:text-7xl font-black leading-tight mb-16">
@@ -69,7 +159,7 @@ const Recruit: React.FC = () => {
       </section>
 
       {/* 2-2. MESSAGE 2: Right-aligned variant */}
-      <section className="pb-40 px-6 container mx-auto">
+      <section className="pb-40 px-6 container mx-auto content-auto">
         <div className="max-w-5xl mx-auto md:ml-[15%] text-right">
           <h2 className="text-4xl md:text-7xl font-black leading-tight mb-16">
             <span className="block mb-2">仕組みで伸ばし、</span>
@@ -85,64 +175,66 @@ const Recruit: React.FC = () => {
       </section>
 
       {/* 2.5. BENEFITS: Draggable Cards */}
-      <DraggableCardContainer className="relative flex min-h-screen w-full items-center justify-center overflow-clip">
-        <p className="absolute top-1/2 mx-auto max-w-md -translate-y-3/4 text-center text-2xl font-black text-neutral-300 md:text-4xl dark:text-neutral-800">
-          私たちと一緒に、<br />未来を創りませんか。
-        </p>
-        {[
-          {
-            title: "リモートワーク",
-            image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2574&auto=format&fit=crop",
-            className: "absolute top-10 left-[20%] rotate-[-5deg]",
-          },
-          {
-            title: "資格取得支援",
-            image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2670&auto=format&fit=crop",
-            className: "absolute top-40 left-[25%] rotate-[-7deg]",
-          },
-          {
-            title: "キャリアアップ",
-            image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop",
-            className: "absolute top-5 left-[40%] rotate-[8deg]",
-          },
-          {
-            title: "チームワーク",
-            image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop",
-            className: "absolute top-32 left-[55%] rotate-[10deg]",
-          },
-          {
-            title: "フレックス制度",
-            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2574&auto=format&fit=crop",
-            className: "absolute top-20 right-[35%] rotate-[2deg]",
-          },
-          {
-            title: "インセンティブ",
-            image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?q=80&w=2671&auto=format&fit=crop",
-            className: "absolute top-24 left-[45%] rotate-[-7deg]",
-          },
-          {
-            title: "スキル習得",
-            image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2670&auto=format&fit=crop",
-            className: "absolute top-8 left-[30%] rotate-[4deg]",
-          },
-        ].map((item, i) => (
-          <DraggableCardBody key={i} className={item.className}>
-            <img
-              src={item.image}
-              alt={item.title}
-              loading="lazy"
-              decoding="async"
-              className="pointer-events-none relative z-10 h-80 w-80 object-cover rounded-md"
-            />
-            <h3 className="mt-4 text-center text-2xl font-bold text-neutral-700 dark:text-neutral-300">
-              {item.title}
-            </h3>
-          </DraggableCardBody>
-        ))}
-      </DraggableCardContainer>
+      <div ref={benefitsSectionRef}>
+        <DraggableCardContainer className="relative flex min-h-screen w-full items-center justify-center overflow-clip content-auto">
+          <p className="absolute top-1/2 mx-auto max-w-md -translate-y-3/4 text-center text-2xl font-black text-neutral-300 md:text-4xl dark:text-neutral-800">
+            私たちと一緒に、<br />未来を創りませんか。
+          </p>
+          {showBenefitsCards && [
+            {
+              title: "リモートワーク",
+              image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2574&auto=format&fit=crop",
+              className: "absolute top-10 left-[20%] rotate-[-5deg]",
+            },
+            {
+              title: "資格取得支援",
+              image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2670&auto=format&fit=crop",
+              className: "absolute top-40 left-[25%] rotate-[-7deg]",
+            },
+            {
+              title: "キャリアアップ",
+              image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop",
+              className: "absolute top-5 left-[40%] rotate-[8deg]",
+            },
+            {
+              title: "チームワーク",
+              image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop",
+              className: "absolute top-32 left-[55%] rotate-[10deg]",
+            },
+            {
+              title: "フレックス制度",
+              image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2574&auto=format&fit=crop",
+              className: "absolute top-20 right-[35%] rotate-[2deg]",
+            },
+            {
+              title: "インセンティブ",
+              image: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?q=80&w=2671&auto=format&fit=crop",
+              className: "absolute top-24 left-[45%] rotate-[-7deg]",
+            },
+            {
+              title: "スキル習得",
+              image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2670&auto=format&fit=crop",
+              className: "absolute top-8 left-[30%] rotate-[4deg]",
+            },
+          ].map((item, i) => (
+            <DraggableCardBody key={i} className={item.className}>
+              <img
+                src={item.image}
+                alt={item.title}
+                loading="lazy"
+                decoding="async"
+                className="pointer-events-none relative z-10 h-80 w-80 object-cover rounded-md"
+              />
+              <h3 className="mt-4 text-center text-2xl font-bold text-neutral-700 dark:text-neutral-300">
+                {item.title}
+              </h3>
+            </DraggableCardBody>
+          ))}
+        </DraggableCardContainer>
+      </div>
 
       {/* 3. WORKING STYLE: WobbleCards */}
-      <section className="py-32 bg-gray-50 dark:bg-zinc-900 border-y border-black/10 dark:border-white/10">
+      <section ref={workStyleSectionRef} className="py-32 bg-gray-50 dark:bg-zinc-900 border-y border-black/10 dark:border-white/10 content-auto">
         <div className="container mx-auto px-6">
           <div className="mb-20 text-center">
             <h3 className="text-5xl md:text-8xl font-black tracking-tighter opacity-10 md:opacity-100 text-gray-200 dark:text-zinc-800 md:absolute left-0 mt-[-2rem] w-full pointer-events-none z-0">
@@ -155,7 +247,7 @@ const Recruit: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mx-auto w-full relative z-10">
             {/* 1. フレックス & リモート（大きめ 2col） */}
-            <WobbleCard
+            {showWorkStyleCards && <WobbleCard
               containerClassName="col-span-1 lg:col-span-2 h-full bg-neutral-900 min-h-[500px] lg:min-h-[300px]"
               backgroundImage="https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2574&auto=format&fit=crop"
             >
@@ -167,10 +259,10 @@ const Recruit: React.FC = () => {
                   フレックスタイム制やリモートワークを導入し、一人ひとりが最もパフォーマンスを発揮できる環境を整えています。ライフスタイルに合わせた柔軟な働き方が可能です。
                 </p>
               </div>
-            </WobbleCard>
+            </WobbleCard>}
 
             {/* 2. 資格取得支援（1col） */}
-            <WobbleCard
+            {showWorkStyleCards && <WobbleCard
               containerClassName="col-span-1 min-h-[300px] bg-neutral-900"
               backgroundImage="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2670&auto=format&fit=crop"
             >
@@ -180,10 +272,10 @@ const Recruit: React.FC = () => {
               <p className="mt-4 max-w-[26rem] text-left text-base/6 text-neutral-200">
                 ITパスポートや宅建など、業務に関連する資格の取得費用を会社が全額負担。スキルアップを全力でバックアップします。
               </p>
-            </WobbleCard>
+            </WobbleCard>}
 
             {/* 3. インセンティブ（1col） */}
-            <WobbleCard
+            {showWorkStyleCards && <WobbleCard
               containerClassName="col-span-1 min-h-[300px] bg-neutral-900"
               backgroundImage="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?q=80&w=2671&auto=format&fit=crop"
             >
@@ -193,10 +285,10 @@ const Recruit: React.FC = () => {
               <p className="mt-4 max-w-[26rem] text-left text-base/6 text-neutral-200">
                 個人の成果がダイレクトに報酬に反映されるインセンティブ制度を導入。頑張った分だけしっかり還元されます。
               </p>
-            </WobbleCard>
+            </WobbleCard>}
 
             {/* 4. キャリアパス（大きめ 2col） */}
-            <WobbleCard
+            {showWorkStyleCards && <WobbleCard
               containerClassName="col-span-1 lg:col-span-2 h-full bg-neutral-900 min-h-[500px] lg:min-h-[300px]"
               backgroundImage="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop"
             >
@@ -208,10 +300,10 @@ const Recruit: React.FC = () => {
                   年功序列ではなく、実力と成果で評価。入社1年目からリーダーに抜擢された実績も。若手でも裁量を持って挑戦できる環境です。
                 </p>
               </div>
-            </WobbleCard>
+            </WobbleCard>}
 
             {/* 5. チームワーク & 社内イベント（フル 3col） */}
-            <WobbleCard
+            {showWorkStyleCards && <WobbleCard
               containerClassName="col-span-1 lg:col-span-3 bg-neutral-900 min-h-[500px] lg:min-h-[600px] xl:min-h-[300px]"
               backgroundImage="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2670&auto=format&fit=crop"
             >
@@ -223,13 +315,13 @@ const Recruit: React.FC = () => {
                   部署や役職を超えたフラットな組織文化が自慢。定期的な社内イベントや懇親会を通じて、チームの結束力を高めています。風通しの良い環境で、アイデアが自由に飛び交います。
                 </p>
               </div>
-            </WobbleCard>
+            </WobbleCard>}
           </div>
         </div>
       </section>
 
       {/* 4. GUIDELINES: Table Layout */}
-      <section className="py-40 px-6 container mx-auto max-w-6xl">
+      <section className="py-40 px-6 container mx-auto max-w-6xl content-auto">
         <h2 className="text-4xl md:text-6xl font-black mb-20 text-center tracking-tighter">REQUIREMENTS</h2>
 
         <div className="space-y-20">
@@ -288,7 +380,7 @@ const Recruit: React.FC = () => {
       </section>
 
       {/* 5. CTA ENTRY */}
-      <section className="py-40 bg-black text-white text-center px-6 selection:bg-brand-blue selection:text-white">
+      <section className="py-40 bg-black text-white text-center px-6 selection:bg-brand-blue selection:text-white content-auto">
         <h2 className="text-6xl md:text-9xl font-black mb-12 tracking-tighter">
           <MaskTextReveal text="ENTRY" />
         </h2>

@@ -2,11 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue } from 'motion/react';
 
 export const CustomCursor = () => {
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
+    const mouseX = useMotionValue(-100);
+    const mouseY = useMotionValue(-100);
     const [isHovering, setIsHovering] = useState(false);
     const [isCursorReady, setIsCursorReady] = useState(false);
     const hoverStateRef = useRef(false);
+    const cursorReadyRef = useRef(false);
+    const rafRef = useRef<number | null>(null);
+    const latestPointerRef = useRef<{ x: number; y: number } | null>(null);
 
     useEffect(() => {
         const canUseCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches;
@@ -14,12 +17,23 @@ export const CustomCursor = () => {
             return;
         }
 
-        const updateMousePosition = (e: MouseEvent) => {
-            if (!isCursorReady) {
+        const flushPointer = () => {
+            rafRef.current = null;
+            const pointer = latestPointerRef.current;
+            if (!pointer) return;
+            mouseX.set(pointer.x);
+            mouseY.set(pointer.y);
+            if (!cursorReadyRef.current) {
+                cursorReadyRef.current = true;
                 setIsCursorReady(true);
             }
-            mouseX.set(e.clientX);
-            mouseY.set(e.clientY);
+        };
+
+        const updateMousePosition = (e: MouseEvent) => {
+            latestPointerRef.current = { x: e.clientX, y: e.clientY };
+            if (rafRef.current === null) {
+                rafRef.current = requestAnimationFrame(flushPointer);
+            }
         };
 
         const handleMouseOver = (e: MouseEvent) => {
@@ -44,8 +58,12 @@ export const CustomCursor = () => {
         return () => {
             window.removeEventListener('mousemove', updateMousePosition);
             window.removeEventListener('mouseover', handleMouseOver);
+            if (rafRef.current !== null) {
+                cancelAnimationFrame(rafRef.current);
+                rafRef.current = null;
+            }
         };
-    }, [isCursorReady, mouseX, mouseY]);
+    }, [mouseX, mouseY]);
 
     if (!isCursorReady) {
         return null;

@@ -80,10 +80,12 @@ const App: React.FC = () => {
                 <Route path="/services/eco-solution" element={routeWithTransition(<EcoSolution />, false)} />
                 <Route path="/services/office-solution" element={routeWithTransition(<OfficeSolution />, false)} />
                 <Route path="/works" element={routeWithTransition(<Works />)} />
+                <Route path="/work" element={routeWithTransition(<Works />)} />
                 <Route path="/news" element={routeWithTransition(<News />)} />
                 <Route path="/contact" element={routeWithTransition(<Contact />)} />
                 <Route path="/recruit" element={routeWithTransition(<Recruit />, false)} />
                 <Route path="/privacy" element={routeWithTransition(<Privacy />)} />
+                <Route path="/sitepolicy" element={routeWithTransition(<SitePolicy />)} />
                 <Route path="/terms" element={routeWithTransition(<SitePolicy />)} />
                 <Route path="/sparkles-demo" element={routeWithTransition(<SparklesDemo />, false)} />
               </Routes>

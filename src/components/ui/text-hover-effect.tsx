@@ -16,23 +16,37 @@ export const TextHoverEffect = ({
   delay?: number;
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const [cursor, setCursor] = useState({ x: 0, y: 0 });
+  const rafRef = useRef<number | null>(null);
+  const latestPointerRef = useRef<{ x: number; y: number } | null>(null);
   const [hovered, setHovered] = useState(false);
   const [maskPosition, setMaskPosition] = useState({ cx: "50%", cy: "50%" });
   const { theme } = useDarkMode();
   const uniqueId = useId().replace(/:/g, "");
 
-  useEffect(() => {
-    if (svgRef.current && cursor.x !== null && cursor.y !== null) {
+  const flushMaskPosition = () => {
+    rafRef.current = null;
+    if (svgRef.current && latestPointerRef.current) {
       const svgRect = svgRef.current.getBoundingClientRect();
-      const cxPercentage = ((cursor.x - svgRect.left) / svgRect.width) * 100;
-      const cyPercentage = ((cursor.y - svgRect.top) / svgRect.height) * 100;
-      setMaskPosition({
+      if (svgRect.width === 0 || svgRect.height === 0) return;
+      const cxPercentage = ((latestPointerRef.current.x - svgRect.left) / svgRect.width) * 100;
+      const cyPercentage = ((latestPointerRef.current.y - svgRect.top) / svgRect.height) * 100;
+      const nextPosition = {
         cx: `${cxPercentage}%`,
         cy: `${cyPercentage}%`,
-      });
+      };
+      setMaskPosition((prev) => (
+        prev.cx === nextPosition.cx && prev.cy === nextPosition.cy ? prev : nextPosition
+      ));
     }
-  }, [cursor]);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
 
   // グラデーション色をモードで切り替え
   const gradientStops = theme === "dark"
@@ -92,7 +106,12 @@ export const TextHoverEffect = ({
         xmlns="http://www.w3.org/2000/svg"
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        onMouseMove={(e) => setCursor({ x: e.clientX, y: e.clientY })}
+        onMouseMove={(e) => {
+          latestPointerRef.current = { x: e.clientX, y: e.clientY };
+          if (rafRef.current === null) {
+            rafRef.current = requestAnimationFrame(flushMaskPosition);
+          }
+        }}
         className="select-none block"
         preserveAspectRatio="xMinYMid meet"
       >

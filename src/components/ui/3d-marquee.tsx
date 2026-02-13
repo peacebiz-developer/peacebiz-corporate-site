@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import { useInView } from "motion/react";
 import { cn } from "../../utils/cn";
 
 export const ThreeDMarquee = ({
@@ -10,6 +12,22 @@ export const ThreeDMarquee = ({
   images: string[];
   className?: string;
 }) => {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [isPageVisible, setIsPageVisible] = useState(
+    typeof document === "undefined" ? true : !document.hidden
+  );
+  const isInView = useInView(rootRef, { amount: 0.2 });
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsPageVisible(!document.hidden);
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
   // Split the images array into 4 equal parts
   const chunkSize = Math.ceil(images.length / 4);
   const chunks = Array.from({ length: 4 }, (_, colIndex) => {
@@ -18,7 +36,7 @@ export const ThreeDMarquee = ({
   });
 
   return (
-    <div className={cn("relative h-full overflow-hidden", className)}>
+    <div ref={rootRef} className={cn("relative h-full overflow-hidden", className)}>
       {/* Grid decorative lines */}
       <GridLineHorizontal className="top-0" offset="0px" />
       <GridLineHorizontal className="bottom-0" offset="0px" />
@@ -37,15 +55,23 @@ export const ThreeDMarquee = ({
         >
           {chunks.map((subarray, colIndex) => (
             <motion.div
-              animate={{ y: colIndex % 2 === 0 ? [0, -200] : [-200, 0] }}
-              transition={{
-                duration: colIndex % 2 === 0 ? 10 : 15,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "linear",
-              }}
+              animate={
+                isInView && isPageVisible
+                  ? { y: colIndex % 2 === 0 ? [0, -200] : [-200, 0] }
+                  : { y: colIndex % 2 === 0 ? 0 : -200 }
+              }
+              transition={
+                isInView && isPageVisible
+                  ? {
+                      duration: colIndex % 2 === 0 ? 10 : 15,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                      ease: "linear",
+                    }
+                  : { duration: 0 }
+              }
               key={`col-${colIndex}`}
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-4 will-change-transform"
             >
               {/* Double the images for seamless loop */}
               {[...subarray, ...subarray].map((image, imageIndex) => (

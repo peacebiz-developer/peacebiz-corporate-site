@@ -183,15 +183,14 @@ const ServiceSection = ({
         {/* ── Content ── */}
         <div className="relative z-10 h-full flex items-center pt-14 md:pt-0">
           <div className="w-full max-w-7xl mx-auto px-5 md:px-20">
-            <div className="flex flex-col md:flex-row md:items-start gap-3 md:gap-16">
+            <div className="relative flex flex-col md:flex-row md:items-start gap-3 md:gap-16">
+              <div
+                className="absolute -inset-4 md:-inset-8 rounded-2xl z-0"
+                style={{ backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)' }}
+              />
 
               {/* Left: Title Block */}
-              <div className="md:w-2/5 relative">
-                <div
-                  className="absolute -inset-4 md:-inset-8 rounded-2xl z-0"
-                  style={{ backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)' }}
-                />
-
+              <div className="md:w-2/5 relative z-[2]">
                 <div className="relative z-[2]">
                   <motion.span
                     style={{ opacity: labelOpacity, x: labelX }}
@@ -231,12 +230,7 @@ const ServiceSection = ({
               </div>
 
               {/* Right: Items List */}
-              <div className="md:w-3/5 relative">
-                <div
-                  className="absolute -inset-4 md:-inset-8 rounded-2xl z-0"
-                  style={{ backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)' }}
-                />
-
+              <div className="md:w-3/5 relative z-[2]">
                 <ul className="space-y-0 relative z-[2]">
                   {service.items.map((item: { label: string; url?: string }, i: number) => (
                     <AnimatedItem

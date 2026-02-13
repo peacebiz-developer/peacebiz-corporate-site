@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import { motion } from "motion/react";
+import React, { useRef, useState } from "react";
+import { motion, useInView } from "motion/react";
 import { cn } from "../../utils/cn";
 
 export const WobbleCard = ({
@@ -14,6 +14,8 @@ export const WobbleCard = ({
   className?: string;
   backgroundImage?: string;
 }) => {
+  const containerRef = useRef<HTMLElement | null>(null);
+  const isInView = useInView(containerRef, { margin: "300px 0px", once: true });
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
@@ -27,6 +29,7 @@ export const WobbleCard = ({
 
   return (
     <motion.section
+      ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => {
@@ -49,7 +52,7 @@ export const WobbleCard = ({
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-500 ease-out"
           style={{
-            backgroundImage: `url(${backgroundImage})`,
+            backgroundImage: isInView ? `url(${backgroundImage})` : undefined,
             filter: isHovering ? "brightness(0.7)" : "brightness(0.35)",
             transform: isHovering
               ? `scale(1.05) translate3d(${-mousePosition.x * 0.5}px, ${-mousePosition.y * 0.5}px, 0)`

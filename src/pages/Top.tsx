@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
@@ -19,6 +19,8 @@ const catColorMap: Record<string, string> = {
 
 const Top: React.FC = () => {
   const containerRef = useRef(null);
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  const heroVisibleRef = useRef(true);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const latestNews = newsData.slice(0, 3);
 
@@ -31,6 +33,46 @@ const Top: React.FC = () => {
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.05]); // Reduced scale for performance
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
+  useEffect(() => {
+    const video = heroVideoRef.current;
+    if (!video || !("IntersectionObserver" in window)) return;
+
+    const tryPlay = () => {
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => { });
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        heroVisibleRef.current = entry.isIntersecting && entry.intersectionRatio > 0.05;
+        if (entry.isIntersecting && entry.intersectionRatio > 0.05) {
+          tryPlay();
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: [0, 0.05, 0.2] }
+    );
+
+    observer.observe(video);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        video.pause();
+      } else if (heroVisibleRef.current) {
+        tryPlay();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <div ref={containerRef} className="min-h-screen bg-white dark:bg-black selection:bg-brand-blue selection:text-white dark:selection:bg-brand-blue dark:selection:text-white border-l border-r border-black/5 dark:border-white/5 max-w-[1920px] mx-auto box-border">
 
@@ -39,9 +81,10 @@ const Top: React.FC = () => {
         {/* Video Background with Parallax Scale */}
         <motion.div
           style={{ scale: heroScale, opacity: heroOpacity }}
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full will-change-transform"
         >
           <video
+            ref={heroVideoRef}
             autoPlay
             loop
             muted

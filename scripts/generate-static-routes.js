@@ -12,10 +12,13 @@ const routes = [
   '/services/eco-solution',
   '/services/office-solution',
   '/works',
+  '/work',
   '/news',
   '/contact',
   '/recruit',
   '/privacy',
+  '/sitepolicy',
+  '/terms',
   '/sparkles-demo',
 ];
 

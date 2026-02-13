@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, useScroll } from 'motion/react';
-import { Phone, Send, CheckCircle } from 'lucide-react';
+import { Phone, Send, CheckCircle, Mail } from 'lucide-react';
 import { Button, Checkbox } from "@nextui-org/react";
 import { MagneticButton } from '../components/ui/MagneticButton';
 
@@ -72,7 +72,7 @@ const Contact: React.FC = () => {
       name: '福岡支社',
       location: 'FUKUOKA',
       address: '福岡県福岡市博多区古門戸1-10 NTF博多ビル7F',
-      phone: '092-233-5888',
+      phone: '092-263-5888',
     },
     {
       name: '仙台支社',
@@ -190,7 +190,7 @@ const Contact: React.FC = () => {
 
         {/* Left: Sticky Info */}
         <div className="w-full lg:w-2/5 bg-gray-50 dark:bg-zinc-900 border-b lg:border-b-0 lg:border-r border-black/10 dark:border-white/10 p-8 md:p-20">
-          <div className="lg:sticky lg:top-32 space-y-16">
+          <div className="lg:sticky lg:top-32 space-y-16 lg:pl-6">
             <div>
               <h3 className="text-3xl font-bold mb-8">オフィス</h3>
               <div className="space-y-10">
@@ -207,6 +207,17 @@ const Contact: React.FC = () => {
                     </a>
                   </div>
                 ))}
+                <div className="group">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="w-2 h-2 bg-brand-blue rounded-full" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-400">COMMON</span>
+                  </div>
+                  <h4 className="text-lg font-bold mb-2">共通メール窓口</h4>
+                  <p className="text-gray-500 text-sm mb-3 font-medium leading-relaxed">全国共通のお問い合わせ窓口です。</p>
+                  <a href="mailto:contact@peace-biz.com" className="text-xl font-mono font-bold hover:text-brand-blue transition-colors flex items-center gap-2 break-all">
+                    <Mail className="w-4 h-4" /> contact@peace-biz.com
+                  </a>
+                </div>
               </div>
             </div>
 

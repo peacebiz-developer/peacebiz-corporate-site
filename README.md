@@ -1,57 +1,82 @@
-# Peacebiz Corporate Site
+# Peace Biz Corporate Site
 
-This project uses Create React App and is configured for automatic deployment to GitHub Pages.
+Peace Biz コーポレートサイト（React + TypeScript + CRA）のリポジトリです。  
+GitHub Pages へ自動デプロイし、独自ドメイン `https://www.peace-biz.com` で公開します。
 
-## Local development and build
+## Tech Stack
 
-In the project directory:
+- React 19
+- TypeScript
+- Create React App (`react-scripts`)
+- Tailwind CSS
+- Framer Motion (`motion`)
+- NextUI
+
+## 実行コマンド
 
 ```bash
 npm install
+npm start
 npm run build
 ```
 
-The production build output is generated in the `build` directory.
+- `npm start`: ローカル開発サーバー起動
+- `npm run build`: 本番ビルド + 静的ルートファイル生成
 
-## GitHub Pages deployment
+## デプロイ
 
-This repository includes `.github/workflows/deploy-github-pages.yml`.
-When you push to `main`, GitHub Actions automatically:
+`main` ブランチへの push で `.github/workflows/deploy-github-pages.yml` が実行され、GitHub Pages に自動反映されます。
 
-1. installs dependencies with `npm ci`
-2. runs `npm run build`
-3. uploads the `build` output
-4. deploys to GitHub Pages
+処理内容:
 
-Published URL:
+1. `npm ci`
+2. `CI=false npm run build`
+3. `build/` を Pages Artifact としてアップロード
+4. GitHub Pages へデプロイ
 
-- https://peacebiz-developer.github.io/peacebiz-corporate-site/
+## ルーティングと GitHub Pages 対応
 
-### Required repository setting
+SPA の直接アクセス（例: `/works`）で 404 を防ぐために、以下を併用しています。
 
-In GitHub repository settings:
+- `public/404.html`（SPA redirect）
+- `scripts/generate-static-routes.js`（主要ルートに `index.html` を生成）
 
-1. Open **Settings** → **Pages**
-2. Under **Build and deployment** → **Source**, choose **GitHub Actions**
-3. Save if prompted
+主な公開ルート:
 
-## Troubleshooting
+- `/`
+- `/about` `/company`
+- `/services`
+- `/services/it-solution`
+- `/services/eco-solution`
+- `/services/office-solution`
+- `/works` `/work`
+- `/news`
+- `/contact`
+- `/recruit`
+- `/privacy`
+- `/sitepolicy` `/terms`
 
-### Assets (CSS/JS/images) return 404
+## SEO / Search Console
 
-- Confirm `package.json` has:
-  - `"homepage": "https://peacebiz-developer.github.io/peacebiz-corporate-site/"`
-- Confirm workflow uploads the `build` directory.
-- Confirm you are accessing the site under `/peacebiz-corporate-site/`.
+- `public/robots.txt`
+- `public/sitemap.xml`
+- `public/index.html` に favicon / OGP / Organization 構造化データを設定
 
-### Blank white page after deploy
+デプロイ後の確認 URL:
 
-- Open browser developer tools and check the Console/Network tabs for missing JS bundles.
-- Verify the latest `Deploy to GitHub Pages` workflow run on `main` succeeded.
-- Verify the repository Pages source is set to **GitHub Actions**.
+- `https://www.peace-biz.com/robots.txt`
+- `https://www.peace-biz.com/sitemap.xml`
 
-### Site opens as raw attachment-like content or wrong response
+## Favicon / App Icon
 
-- Confirm GitHub Pages is enabled in repository settings.
-- Confirm deployment came from the `deploy-github-pages.yml` workflow, not a manual artifact host.
-- Re-run workflow from the **Actions** tab with **Run workflow** after confirming settings.
+`public/favicon_io/` に favicon 一式を配置し、`public/index.html` と `public/manifest.json` で参照しています。
+
+## 独自ドメイン
+
+- `CNAME`: `www.peace-biz.com`
+- `package.json` の `homepage`: `https://www.peace-biz.com`
+
+## 注意事項
+
+- GitHub Pages 反映前は、本番 URL で新規ルートや `sitemap.xml` が 404 のままになる場合があります。
+- 反映確認は、Actions 成功後に本番 URL で行ってください。

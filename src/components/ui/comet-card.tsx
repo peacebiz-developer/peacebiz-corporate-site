@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   motion,
   useMotionValue,
@@ -21,6 +21,9 @@ export const CometCard = ({
   children: React.ReactNode;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const rectRef = useRef<DOMRect | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const pointerRef = useRef<{ x: number; y: number } | null>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -55,32 +58,61 @@ export const CometCard = ({
 
   const glareBackground = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255, 255, 255, 0.9) 10%, rgba(255, 255, 255, 0.75) 20%, rgba(255, 255, 255, 0) 80%)`;
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const updateRect = () => {
     if (!ref.current) return;
+    rectRef.current = ref.current.getBoundingClientRect();
+  };
 
-    const rect = ref.current.getBoundingClientRect();
+  const flushPointer = () => {
+    rafRef.current = null;
+    const pointer = pointerRef.current;
+    const rect = rectRef.current;
+    if (!pointer || !rect) return;
+    if (rect.width === 0 || rect.height === 0) return;
 
-    const width = rect.width;
-    const height = rect.height;
+    const mouseX = pointer.x - rect.left;
+    const mouseY = pointer.y - rect.top;
 
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
+    const xPct = mouseX / rect.width - 0.5;
+    const yPct = mouseY / rect.height - 0.5;
 
     x.set(xPct);
     y.set(yPct);
   };
 
+  const handleMouseEnter = () => {
+    updateRect();
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    pointerRef.current = { x: e.clientX, y: e.clientY };
+    if (rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(flushPointer);
+    }
+  };
+
   const handleMouseLeave = () => {
+    pointerRef.current = null;
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
     x.set(0);
     y.set(0);
   };
 
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
+
   return (
     <motion.div
       ref={ref}
+      onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{

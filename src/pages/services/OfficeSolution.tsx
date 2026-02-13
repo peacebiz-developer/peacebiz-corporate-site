@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { Button } from "@nextui-org/react";
 import { MaskTextReveal } from '../../components/ui/MaskTextReveal';
 import { MagneticButton } from '../../components/ui/MagneticButton';
-import { AuroraBackground } from '../../components/ui/aurora-background';
 import { GlowingEffect } from '../../components/ui/glowing-effect';
 
 /* ─── Shared animation variant ─── */
@@ -113,7 +112,7 @@ const OfficeSolution: React.FC = () => {
         <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
 
             {/* ═══════════════════════════════════
-                1. HERO — Background Image + Aurora Overlay
+                1. HERO — Background Image
             ═══════════════════════════════════ */}
             <section className="relative h-screen w-full overflow-hidden">
                 {/* Background image (底面) */}
@@ -126,14 +125,6 @@ const OfficeSolution: React.FC = () => {
                     />
                     <div className="absolute inset-0 bg-black/40" />
                 </div>
-
-                {/* Aurora overlay (画像の上) */}
-                <AuroraBackground
-                    className="!absolute inset-0 !h-full bg-transparent dark:bg-transparent"
-                    showRadialGradient={true}
-                >
-                    <div />
-                </AuroraBackground>
 
                 {/* Noise texture */}
                 <div
