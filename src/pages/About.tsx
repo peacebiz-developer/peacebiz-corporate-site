@@ -280,10 +280,11 @@ const About: React.FC = () => {
 
               <div className="text-xs font-bold text-brand-blue tracking-widest uppercase py-1">事業内容</div>
               <div className="text-lg font-medium leading-relaxed">
-                店舗・オフィス・施設の空間プロデュース<br />
-                デジタルサイネージの企画・販売・施工<br />
-                省エネソリューションの提案<br />
-                通信インフラの整備
+                空間演出／サイネージ（Prime Sign、LED Vision等）<br />
+                設備／オフィス環境（空調・什器・通信等）<br />
+                エネルギーソリューション（業務用エアコン等）<br />
+                IT／アプリ提供（業務支援・システム構築等） <br />
+                関連事業（演出商材・飲食店経営）
               </div>
 
               <div className="text-xs font-bold text-brand-blue tracking-widest uppercase py-1">設立</div>
@@ -308,7 +309,7 @@ const About: React.FC = () => {
             {[
               { name: '東京本社', jp: 'Tokyo Head Office', address: '東京都豊島区上池袋1-10-8 エデン上池袋ビル5F', phone: '03-3917-3587', img: `${process.env.PUBLIC_URL || ''}/tokyo-hq.webp` },
               { name: '仙台支社', jp: 'Sendai Branch', address: '宮城県仙台市青葉区国分町1-4-9', phone: '022-722-1385', img: `${process.env.PUBLIC_URL || ''}/sendai-branch.webp` },
-              { name: '福岡支社', jp: 'Fukuoka Branch', address: '福岡県福岡市博多区古門戸1-10 NTF博多ビル7F', phone: '092-233-5888', img: `${process.env.PUBLIC_URL || ''}/fukuoka-branch.webp` }
+              { name: '福岡支社', jp: 'Fukuoka Branch', address: '福岡県福岡市博多区古門戸1-10 NTF博多ビル7F', phone: '092-263-5888', img: `${process.env.PUBLIC_URL || ''}/fukuoka-branch.webp` }
             ].map((office, i) => (
               <div key={i} className="group cursor-pointer">
                 <div className="overflow-hidden mb-6 rounded-sm">
