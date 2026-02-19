@@ -1,31 +1,83 @@
-import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, X, Calendar, Tag } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { MaskTextReveal } from '../components/ui/MaskTextReveal';
-import { newsData } from '../data/newsData';
+import { Card } from '../components/ui/card';
+import Pagination from '../components/ui/Pagination';
+import { NEWS_PAGE_SIZE, newsData } from '../data/newsData';
 
-const categories = ["All", "Info", "Works", "Recruit"];
+const categories = ['All', 'Info', 'Works', 'Recruit'] as const;
 
 const catColorMap: Record<string, string> = {
-  Info: "bg-brand-blue",
-  Works: "bg-brand-green",
-  Recruit: "bg-brand-orange",
+  Info: 'bg-brand-blue',
+  Works: 'bg-brand-green',
+  Recruit: 'bg-brand-orange',
+};
+
+const catTextColorMap: Record<string, string> = {
+  Info: 'text-brand-blue',
+  Works: 'text-brand-green',
+  Recruit: 'text-brand-orange',
 };
 
 const News: React.FC = () => {
-  const [selectedNews, setSelectedNews] = useState<(typeof newsData)[0] | null>(null);
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>('All');
+  const [page, setPage] = useState(1);
+  const didMountRef = useRef(false);
 
-  const filteredNews =
-    activeCategory === "All"
-      ? newsData
-      : newsData.filter((n) => n.cat === activeCategory);
+  const filteredNews = useMemo(
+    () =>
+      activeCategory === 'All'
+        ? newsData
+        : newsData.filter((item) => item.cat === activeCategory),
+    [activeCategory]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filteredNews.length / NEWS_PAGE_SIZE));
+  const paginatedNews = useMemo(
+    () => filteredNews.slice((page - 1) * NEWS_PAGE_SIZE, page * NEWS_PAGE_SIZE),
+    [filteredNews, page]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [activeCategory]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [page]);
+
+  const renderCategoryButton = (cat: (typeof categories)[number]) => {
+    const isActive = activeCategory === cat;
+    return (
+      <button
+        key={cat}
+        onClick={() => setActiveCategory(cat)}
+        className={`text-sm font-bold uppercase tracking-widest px-5 py-2 rounded-full border transition-all duration-300 ${
+          isActive
+            ? 'bg-black text-white dark:bg-white dark:text-black border-transparent'
+            : 'border-gray-300 dark:border-zinc-700 text-gray-500 hover:border-black dark:hover:border-white'
+        }`}
+      >
+        {cat}
+      </button>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
-      {/* Header */}
-      <section className="pt-40 pb-12 px-6 md:px-20 container mx-auto">
+      <section id="news-hero" className="pt-40 pb-12 px-6 md:px-20 container mx-auto scroll-mt-28">
         <h1 className="text-[12vw] md:text-[8rem] font-black leading-none tracking-tighter mb-6">
           <MaskTextReveal text="NEWS" />
         </h1>
@@ -39,171 +91,116 @@ const News: React.FC = () => {
         </motion.p>
       </section>
 
-      {/* Category Filter */}
-      <section className="px-6 md:px-20 container mx-auto">
+      <section id="news-list" className="px-6 md:px-20 container mx-auto scroll-mt-28">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="flex flex-wrap gap-3 border-b border-black/10 dark:border-white/10 pb-8"
+          className="md:hidden border-b border-black/10 dark:border-white/10 pb-8"
         >
-          {categories.map((cat) => {
-            const isActive = activeCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`text-sm font-bold uppercase tracking-widest px-5 py-2 rounded-full border transition-all duration-300 ${
-                  isActive
-                    ? "bg-black text-white dark:bg-white dark:text-black border-transparent"
-                    : "border-gray-300 dark:border-zinc-700 text-gray-500 hover:border-black dark:hover:border-white"
-                }`}
-              >
-                {cat}
-              </button>
-            );
-          })}
+          <div className="flex flex-wrap gap-3">{renderCategoryButton('All')}</div>
+          <div className="mt-3 flex flex-wrap gap-3">
+            {categories.filter((cat) => cat !== 'All').map((cat) => renderCategoryButton(cat))}
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="hidden md:flex flex-wrap gap-3 border-b border-black/10 dark:border-white/10 pb-8"
+        >
+          {categories.map((cat) => renderCategoryButton(cat))}
         </motion.div>
       </section>
 
-      {/* News List */}
-      <section className="px-6 md:px-20 pb-40 container mx-auto">
-        <div className="border-t border-black/10 dark:border-white/10">
+      <section className="px-6 md:px-20 pb-20 pt-12 md:pt-16 container mx-auto">
+        <div className="grid gap-y-10 sm:grid-cols-12 sm:gap-y-12 md:gap-y-16 lg:gap-y-20">
           <AnimatePresence mode="popLayout">
-            {filteredNews.map((news, i) => (
+            {paginatedNews.map((news, index) => (
               <motion.div
-                key={`${news.date}-${news.title}`}
+                key={news.slug}
                 layout
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{
                   duration: 0.4,
-                  delay: i * 0.05,
+                  delay: index * 0.06,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="group flex flex-col md:flex-row items-start md:items-center py-8 border-b border-black/10 dark:border-white/10 cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 transition-colors px-4 -mx-4"
-                onClick={() => setSelectedNews(news)}
+                className="sm:col-span-12 lg:col-span-10 lg:col-start-2"
               >
-                <div className="w-48 shrink-0 text-sm font-mono text-gray-500 mb-2 md:mb-0 group-hover:text-black dark:group-hover:text-white transition-colors">
-                  {news.date}
-                </div>
-                <div className="w-32 shrink-0 mb-2 md:mb-0">
-                  <span className="text-xs font-bold border border-black/20 dark:border-white/20 px-3 py-1 rounded-full uppercase tracking-wider group-hover:bg-brand-blue group-hover:border-transparent group-hover:text-white transition-colors">
-                    {news.cat}
-                  </span>
-                </div>
-                <h3 className="text-lg md:text-xl font-bold group-hover:translate-x-2 transition-transform duration-300 w-full group-hover:text-brand-blue">
-                  {news.title}
-                </h3>
-                <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight className="w-5 h-5 text-brand-blue" />
-                </div>
+                <Link to={`/news/${news.slug}`} className="block">
+                  <Card className="group border-0 bg-transparent shadow-none cursor-pointer">
+                    <div className="grid gap-y-6 sm:grid-cols-10 sm:gap-x-5 sm:gap-y-0 md:items-center md:gap-x-8 lg:gap-x-12">
+                      <div className="sm:col-span-5">
+                        <div className="mb-4 md:mb-6">
+                          <div className="flex flex-wrap items-center gap-3 md:gap-5">
+                            <span
+                              className={`inline-block text-xs font-bold border px-3 py-1 rounded-full uppercase tracking-wider transition-colors duration-300 ${
+                                catColorMap[news.cat]
+                                  ? `border-transparent text-white ${catColorMap[news.cat]}`
+                                  : 'border-gray-300 dark:border-zinc-600 text-gray-500'
+                              }`}
+                            >
+                              {news.cat}
+                            </span>
+                          </div>
+                        </div>
+                        <h3 className="text-xl font-semibold md:text-2xl lg:text-3xl leading-tight group-hover:text-brand-blue transition-colors duration-300">
+                          {news.title}
+                        </h3>
+                        <p className="mt-4 text-gray-500 dark:text-gray-400 line-clamp-3 md:mt-5 leading-relaxed">
+                          {news.content}
+                        </p>
+                        <div className="mt-6 flex items-center space-x-4 text-sm md:mt-8">
+                          <span className="text-gray-400 font-mono">{news.date}</span>
+                          <span className="text-gray-300 dark:text-gray-600">•</span>
+                          <span className="text-gray-400">株式会社ピース・ビズ</span>
+                        </div>
+                        <div className="mt-6 flex items-center space-x-2 md:mt-8">
+                          <span
+                            className={`inline-flex items-center font-semibold md:text-base group-hover:underline ${
+                              catTextColorMap[news.cat] || 'text-brand-blue'
+                            }`}
+                          >
+                            <span>詳しく読む</span>
+                            <ArrowRight className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="order-first sm:order-last sm:col-span-5">
+                        <div className="aspect-[16/9] overflow-clip rounded-lg border border-black/5 dark:border-white/10">
+                          <img
+                            src={news.img}
+                            alt={news.title}
+                            loading="lazy"
+                            className="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:opacity-80"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+                {index < paginatedNews.length - 1 && (
+                  <div className="mt-10 sm:mt-12 md:mt-16 lg:mt-20 border-b border-black/5 dark:border-white/5" />
+                )}
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
 
-        {filteredNews.length === 0 && (
+        {paginatedNews.length === 0 && (
           <div className="py-20 text-center text-gray-400 font-bold text-lg">
             該当するニュースがありません。
           </div>
         )}
       </section>
 
-      {/* News Detail Modal (Portal) */}
-      {createPortal(
-        <AnimatePresence>
-          {selectedNews && (
-            <motion.div
-              key="news-modal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 bg-black/60 backdrop-blur-sm"
-              onClick={() => setSelectedNews(null)}
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.92, y: 30 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.92, y: 30 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="relative w-full max-w-6xl max-h-[90vh] bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* 左側：写真 */}
-                <div className="relative lg:w-1/2 h-64 lg:h-auto shrink-0">
-                  <img
-                    src={selectedNews.img}
-                    alt={selectedNews.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/40 via-transparent to-transparent" />
-                  {/* モバイル用閉じるボタン */}
-                  <button
-                    onClick={() => setSelectedNews(null)}
-                    className="lg:hidden absolute top-4 right-4 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* 右側：テキスト情報 */}
-                <div className="lg:w-1/2 flex flex-col relative overflow-y-auto">
-                  {/* デスクトップ用閉じるボタン */}
-                  <button
-                    onClick={() => setSelectedNews(null)}
-                    className="hidden lg:flex absolute top-6 right-6 w-10 h-10 rounded-full border border-black/10 dark:border-white/10 items-center justify-center hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors text-black dark:text-white z-10"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-
-                  <div className="p-8 md:p-10 lg:p-12 flex flex-col justify-center flex-1">
-                    {/* メタ情報 */}
-                    <div className="flex flex-wrap items-center gap-4 mb-6">
-                      <div className="flex items-center gap-2 text-sm text-gray-400 font-mono">
-                        <Calendar className="w-4 h-4" />
-                        {selectedNews.date}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Tag className="w-3.5 h-3.5 text-gray-400" />
-                        <span className={`inline-block px-3 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider ${catColorMap[selectedNews.cat] || "bg-gray-600"}`}>
-                          {selectedNews.cat}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* 区切り線 */}
-                    <div className="w-12 h-0.5 bg-gradient-to-r from-brand-blue to-brand-green mb-8" />
-
-                    {/* タイトル */}
-                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-black leading-tight text-black dark:text-white mb-8">
-                      {selectedNews.title}
-                    </h3>
-
-                    {/* 本文 */}
-                    <div className="text-gray-600 dark:text-gray-300 leading-relaxed text-base md:text-lg whitespace-pre-line">
-                      {selectedNews.content}
-                    </div>
-
-                    {/* フッター */}
-                    <div className="mt-10 pt-8 border-t border-gray-100 dark:border-zinc-800">
-                      <button
-                        onClick={() => setSelectedNews(null)}
-                        className="inline-flex items-center gap-2 text-sm font-bold tracking-widest uppercase text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-                      >
-                        <ArrowRight className="w-4 h-4 rotate-180" />
-                        ニュース一覧に戻る
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+      <section className="pb-24 md:pb-32 px-6">
+        <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+      </section>
     </div>
   );
 };

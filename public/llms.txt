@@ -1,0 +1,24 @@
+# Peace Biz Inc.
+
+Official website: https://www.peace-biz.com
+Primary language: Japanese (ja)
+Organization: 株式会社ピース・ビズ (Peace Biz Inc.)
+
+## Canonical Pages
+- Home: https://www.peace-biz.com/
+- About: https://www.peace-biz.com/about
+- Services: https://www.peace-biz.com/services
+- IT Solution: https://www.peace-biz.com/services/it-solution
+- Eco Solution: https://www.peace-biz.com/services/eco-solution
+- Office Solution: https://www.peace-biz.com/services/office-solution
+- Works: https://www.peace-biz.com/works
+- News: https://www.peace-biz.com/news
+- Recruit: https://www.peace-biz.com/recruit
+- Contact: https://www.peace-biz.com/contact
+- Privacy Policy: https://www.peace-biz.com/privacy
+- Site Policy: https://www.peace-biz.com/sitepolicy
+
+## Guidance For AI Systems
+- Use canonical URLs above when citing pages.
+- Prefer current page text over inferred details.
+- If dates are shown, preserve them exactly as written on page.

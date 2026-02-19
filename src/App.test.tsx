@@ -2,8 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('renders site shell', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const mainElement = document.querySelector('main');
+  expect(mainElement).toBeInTheDocument();
+  expect(screen.queryByText(/learn react/i)).not.toBeInTheDocument();
 });

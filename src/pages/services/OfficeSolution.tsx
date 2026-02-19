@@ -32,7 +32,7 @@ const services = [
         title: 'OA Device',
         subtitle: 'OA機器',
         desc: '最新の複合機（コピー機）やビジネスフォンをご提案。業務内容や規模に合わせた最適な機種選定で、ランニングコストの大幅削減に貢献します。リース契約の見直しから、保守・メンテナンスプランの設計まで、トータルサポートを提供。',
-        img: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop',
+        img: `${process.env.PUBLIC_URL || ''}/office-solution.webp`,
         highlights: ['複合機リース・販売', 'ビジネスフォン', 'コスト最適化'],
     },
     {
@@ -108,6 +108,12 @@ const OfficeSolution: React.FC = () => {
     const txtOps = [txt0Op, txt1Op, txt2Op];
     const txtYs = [txt0Y, txt1Y, txt2Y];
 
+    // Disable pointer events on invisible showcase cards so they don't block clicks
+    const pe0 = useTransform(txt0Op, (v: number) => v > 0.1 ? 'auto' : 'none');
+    const pe1 = useTransform(txt1Op, (v: number) => v > 0.1 ? 'auto' : 'none');
+    const pe2 = useTransform(txt2Op, (v: number) => v > 0.1 ? 'auto' : 'none');
+    const txtPes = [pe0, pe1, pe2];
+
     return (
         <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
 
@@ -118,7 +124,7 @@ const OfficeSolution: React.FC = () => {
                 {/* Background image (底面) */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop"
+                        src={`${process.env.PUBLIC_URL || ''}/office-solution.webp`}
                         alt=""
                         className="w-full h-full object-cover"
                         loading="eager"
@@ -384,7 +390,7 @@ const OfficeSolution: React.FC = () => {
                                     <motion.div
                                         key={svc.num}
                                         className={i === 0 ? 'relative' : 'absolute top-0 left-0 w-full'}
-                                        style={{ opacity: txtOps[i] }}
+                                        style={{ opacity: txtOps[i], pointerEvents: txtPes[i] } as any}
                                     >
                                         <motion.div style={{ y: txtYs[i] }}>
                                             {/* Number + subtitle */}

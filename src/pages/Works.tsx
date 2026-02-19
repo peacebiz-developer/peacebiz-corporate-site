@@ -1,300 +1,264 @@
-import React, { useState, useMemo } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { MaskTextReveal } from '../components/ui/MaskTextReveal';
-import { HoverBorderGradient } from '../components/ui/hover-border-gradient';
+import Pagination from '../components/ui/Pagination';
 import { cn } from '../utils/cn';
-
-// Mock Data
-const worksData = [
-  {
-    id: 1,
-    category: 'it',
-    title: '準備中',
-    client: '準備中',
-    year: '2024',
-    img: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070&auto=format&fit=crop',
-    description: '準備中',
-    scope: '準備中',
-  },
-  {
-    id: 2,
-    category: 'eco',
-    title: '準備中',
-    client: '準備中',
-    year: '2023',
-    img: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop',
-    description: '準備中',
-    scope: '準備中',
-  },
-  {
-    id: 3,
-    category: 'office',
-    title: '準備中',
-    client: '準備中',
-    year: '2023',
-    img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop',
-    description: '準備中',
-    scope: '準備中',
-  },
-  {
-    id: 4,
-    category: 'it',
-    title: '準備中',
-    client: '準備中',
-    year: '2024',
-    img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop',
-    description: '準備中',
-    scope: '準備中',
-  },
-  {
-    id: 5,
-    category: 'eco',
-    title: '準備中',
-    client: '準備中',
-    year: '2022',
-    img: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=2070&auto=format&fit=crop',
-    description: '準備中',
-    scope: '準備中',
-  },
-  {
-    id: 6,
-    category: 'office',
-    title: '準備中',
-    client: '準備中',
-    year: '2024',
-    img: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop',
-    description: '準備中',
-    scope: '準備中',
-  },
-];
+import {
+  WORKS_PAGE_SIZE,
+  worksData,
+  getBentoSize,
+  bentoSizeClass,
+  categoryLabels,
+  categoryColors,
+  categoryAccents,
+  categoryTextColors,
+  categorySubServices,
+  type WorkItem,
+} from '../data/worksData';
 
 const Works: React.FC = () => {
   const [filter, setFilter] = useState('all');
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [hovered, setHovered] = useState<number | null>(null);
+  const [activeService, setActiveService] = useState<string | null>(null);
+  const [expandedCat, setExpandedCat] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const filteredWorks = useMemo(() => {
-    return filter === 'all' ? worksData : worksData.filter(w => w.category === filter);
-  }, [filter]);
+    let works = worksData;
+    if (filter !== 'all') {
+      works = works.filter((w) => w.category === filter);
+    }
+    if (activeService) {
+      works = works.filter((w) => w.service === activeService);
+    }
+    return works;
+  }, [filter, activeService]);
 
-  const selectedWork = worksData.find(w => w.id === selectedId);
+  const totalPages = Math.max(1, Math.ceil(filteredWorks.length / WORKS_PAGE_SIZE));
+  const paginatedWorks = useMemo(
+    () => filteredWorks.slice((page - 1) * WORKS_PAGE_SIZE, page * WORKS_PAGE_SIZE),
+    [filteredWorks, page]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter, activeService]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
+
+  const handleAllClick = () => {
+    setFilter('all');
+    setActiveService(null);
+    setExpandedCat(null);
+  };
+
+  const handleCategoryClick = (cat: string) => {
+    if (filter === cat && !activeService) {
+      setFilter('all');
+      setActiveService(null);
+      setExpandedCat(null);
+    } else {
+      setFilter(cat);
+      setActiveService(null);
+      setExpandedCat(cat);
+    }
+  };
+
+  const handleSubServiceClick = (cat: string, serviceKey: string) => {
+    setFilter(cat);
+    setActiveService((prev) => (prev === serviceKey ? null : serviceKey));
+  };
+
+  const filterLabelMap: Record<'it' | 'eco' | 'office', string> = {
+    it: 'IT',
+    eco: 'ECO',
+    office: 'OFFICE',
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
-
-      {/* 1. Header */}
-      <section className="pt-40 pb-20 px-6 container mx-auto">
+      <section id="works-hero" className="pt-40 pb-20 px-6 container mx-auto scroll-mt-28">
         <h1 className="text-[12vw] md:text-[8rem] font-black leading-none tracking-tighter mb-12">
           <MaskTextReveal text="事例" />
-          <span className="text-gray-400 block"><MaskTextReveal text="OUR WORKS" delay={0.1} /></span>
+          <span className="text-gray-400 block">
+            <MaskTextReveal text="OUR WORKS" delay={0.1} />
+          </span>
         </h1>
 
-        {/* Filter */}
-        <div className="flex flex-wrap gap-4 border-b border-black/10 dark:border-white/10 pb-8">
-          {['all', 'it', 'eco', 'office'].map((cat) => {
-            const isActive = filter === cat;
-            let activeClass = 'bg-black text-white dark:bg-white dark:text-black border-transparent';
-            if (isActive) {
-              if (cat === 'it') activeClass = 'bg-brand-blue text-white border-brand-blue';
-              else if (cat === 'eco') activeClass = 'bg-brand-green text-white border-brand-green';
-              else if (cat === 'office') activeClass = 'bg-brand-orange text-white border-brand-orange';
-            }
+        <div className="border-b border-black/10 dark:border-white/10 pb-8">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            <button
+              onClick={handleAllClick}
+              className={cn(
+                'text-sm font-bold uppercase tracking-widest px-4 py-2 rounded-full border transition-all',
+                filter === 'all'
+                  ? 'bg-black text-white dark:bg-white dark:text-black border-transparent'
+                  : 'border-gray-300 dark:border-zinc-800 text-gray-500 hover:border-black dark:hover:border-white'
+              )}
+            >
+              All
+            </button>
 
-            return (
-              <button
-                key={cat}
-                onClick={() => { setFilter(cat); setHovered(null); }}
-                className={`text-sm font-bold uppercase tracking-widest px-4 py-2 rounded-full border transition-all ${isActive ? activeClass : 'border-gray-300 dark:border-zinc-800 text-gray-500 hover:border-black dark:hover:border-white'}`}
-              >
-                {cat}
-              </button>
-            )
-          })}
+            {(['it', 'eco', 'office'] as const).map((cat) => {
+              const isActive = filter === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handleCategoryClick(cat)}
+                  onMouseEnter={() => setExpandedCat(cat)}
+                  onMouseLeave={() => {
+                    if (filter !== cat) setExpandedCat(null);
+                  }}
+                  className={cn(
+                    'text-sm font-bold uppercase tracking-widest px-4 py-2 rounded-full border transition-all',
+                    isActive
+                      ? `${categoryColors[cat]} text-white border-transparent`
+                      : 'border-gray-300 dark:border-zinc-800 text-gray-500 hover:border-black dark:hover:border-white'
+                  )}
+                >
+                  {filterLabelMap[cat]}
+                </button>
+              );
+            })}
+          </div>
+
+          <AnimatePresence mode="wait">
+            {(() => {
+              const activeCat = expandedCat ?? (filter !== 'all' ? filter : null);
+              if (!activeCat) return null;
+              const subs = categorySubServices[activeCat];
+              const accentColor = categoryAccents[activeCat];
+              if (!subs) return null;
+
+              return (
+                <motion.div
+                  key={activeCat}
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className="overflow-hidden"
+                  onMouseEnter={() => setExpandedCat(activeCat)}
+                  onMouseLeave={() => {
+                    if (filter !== activeCat) setExpandedCat(null);
+                  }}
+                >
+                  <div className="flex flex-wrap items-center gap-x-1 gap-y-1 pt-4">
+                    <span className="w-5 h-px shrink-0 mr-1" style={{ backgroundColor: `${accentColor}60` }} />
+                    {subs.map((sub, index) => (
+                      <React.Fragment key={sub.key}>
+                        {index > 0 && <span className="text-gray-300 dark:text-zinc-600 text-[10px] select-none">·</span>}
+                        <motion.span
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.04, duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                          onClick={() => handleSubServiceClick(activeCat, sub.key)}
+                          className={cn(
+                            'text-[11px] md:text-xs whitespace-nowrap cursor-pointer transition-all duration-200 py-1 px-1.5 rounded select-none',
+                            activeService === sub.key
+                              ? 'font-bold'
+                              : 'font-medium text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-black/[0.03] dark:hover:bg-white/[0.05]'
+                          )}
+                          style={activeService === sub.key ? { color: accentColor } : undefined}
+                        >
+                          {sub.label}
+                        </motion.span>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </motion.div>
+              );
+            })()}
+          </AnimatePresence>
         </div>
       </section>
 
-      {/* 2. Focus Cards Grid */}
-      <section className="px-4 md:px-6 pb-40 container mx-auto">
+      <section id="works-gallery" className="px-4 md:px-6 pb-20 container mx-auto scroll-mt-28">
         <AnimatePresence mode="popLayout">
           <motion.div
             layout
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 w-full"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[220px] md:auto-rows-[260px] gap-4 md:gap-5 grid-flow-row-dense"
           >
-            {filteredWorks.map((work, index) => (
-              <motion.div
-                key={work.id}
-                layout
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-                onMouseEnter={() => setHovered(index)}
-                onMouseLeave={() => setHovered(null)}
-                className={cn(
-                  "rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full transition-all duration-300 ease-out",
-                  hovered !== null && hovered !== index && "blur-sm scale-[0.98]"
-                )}
-              >
-                <img
-                  src={work.img}
-                  alt={work.title}
-                  loading="lazy"
-                  className="object-cover absolute inset-0 w-full h-full"
+            {paginatedWorks.map((work, index) => {
+              const size = getBentoSize(index);
+              return (
+                <BentoCard
+                  key={work.slug}
+                  work={work}
+                  index={index}
+                  sizeClass={bentoSizeClass(size)}
                 />
-                {/* 常時表示のオーバーレイ + テキスト情報 */}
-                <div className="absolute inset-0 bg-black/50" />
-                <div
-                  className={cn(
-                    "absolute inset-0 flex flex-col justify-end p-6 md:p-8 transition-opacity duration-300",
-                    hovered === index ? "opacity-0" : "opacity-100"
-                  )}
-                >
-                  <span className={cn(
-                    "text-xs font-bold uppercase tracking-widest mb-2",
-                    work.category === 'it' ? 'text-blue-400' :
-                    work.category === 'eco' ? 'text-green-400' :
-                    'text-orange-400'
-                  )}>
-                    {work.category}
-                  </span>
-                  <div className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-200">
-                    {work.title}
-                  </div>
-                  <p className="text-sm text-white/60 mt-1 font-medium">
-                    {work.client} — {work.year}
-                  </p>
-                </div>
-                {/* ホバー時に表示される「詳細を見る」ボタン */}
-                <div
-                  className={cn(
-                    "absolute inset-0 flex items-center justify-center transition-opacity duration-300 z-10",
-                    hovered === index ? "opacity-100" : "opacity-0 pointer-events-none"
-                  )}
-                >
-                  <div
-                    onClick={() => setSelectedId(work.id)}
-                    className="cursor-pointer"
-                  >
-                    <HoverBorderGradient
-                      containerClassName="rounded-full"
-                      as="span"
-                      className="dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
-                    >
-                      <span>詳細を見る</span>
-                    </HoverBorderGradient>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+              );
+            })}
           </motion.div>
         </AnimatePresence>
+
+        {paginatedWorks.length === 0 && (
+          <div className="py-20 text-center text-gray-400 font-bold text-lg">
+            該当する事例がありません。
+          </div>
+        )}
       </section>
 
-      {/* 3. Modal Overlay (Portal) */}
-      {createPortal(
-        <AnimatePresence>
-          {selectedWork && (
-            <motion.div
-              key="works-modal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9999] grid place-items-center p-4"
-              onClick={() => setSelectedId(null)}
-            >
-              <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                className="bg-white dark:bg-zinc-900 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl overflow-hidden relative z-10 shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Modal Header Image */}
-                <div className="relative h-[300px] md:h-[400px]">
-                  <img
-                    src={selectedWork.img}
-                    className="w-full h-full object-cover"
-                    alt={selectedWork.title}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <button
-                    onClick={() => setSelectedId(null)}
-                    className="absolute top-6 right-6 w-10 h-10 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                  {/* カテゴリバッジ（画像上） */}
-                  <div className="absolute bottom-6 left-8 md:left-12">
-                    <span className={cn(
-                      "inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-white",
-                      selectedWork.category === 'it' ? 'bg-brand-blue' :
-                      selectedWork.category === 'eco' ? 'bg-brand-green' :
-                      selectedWork.category === 'office' ? 'bg-brand-orange' : 'bg-gray-600'
-                    )}>
-                      {selectedWork.category === 'it' ? 'IT Solution' :
-                       selectedWork.category === 'eco' ? 'Eco Solution' :
-                       selectedWork.category === 'office' ? 'Office Solution' : selectedWork.category}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Modal Body */}
-                <div className="p-8 md:p-12">
-                  <h2 className="text-3xl md:text-4xl font-black mb-4 text-black dark:text-white">
-                    {selectedWork.title}
-                  </h2>
-
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 pb-8 border-b border-gray-200 dark:border-zinc-800">
-                    <div>
-                      <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-1">Client</h4>
-                      <p className="font-bold text-black dark:text-white">{selectedWork.client}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-1">Year</h4>
-                      <p className="font-bold text-black dark:text-white">{selectedWork.year}</p>
-                    </div>
-                    <div className="col-span-2 md:col-span-1">
-                      <h4 className="font-bold text-gray-400 text-xs uppercase tracking-widest mb-1">Category</h4>
-                      <p className={cn(
-                        "font-bold",
-                        selectedWork.category === 'it' ? 'text-brand-blue' :
-                        selectedWork.category === 'eco' ? 'text-brand-green' :
-                        selectedWork.category === 'office' ? 'text-brand-orange' : ''
-                      )}>
-                        {selectedWork.category === 'it' ? 'IT Solution' :
-                         selectedWork.category === 'eco' ? 'Eco Solution' :
-                         selectedWork.category === 'office' ? 'Office Solution' : selectedWork.category}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mb-8">
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">プロジェクト概要</h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
-                      {selectedWork.description}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">対応範囲</h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
-                      {selectedWork.scope}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
-
+      <section className="pb-24 md:pb-32 px-6">
+        <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+      </section>
     </div>
   );
 };
+
+interface BentoCardProps {
+  work: WorkItem;
+  index: number;
+  sizeClass: string;
+}
+
+const BentoCard = React.memo(({ work, index, sizeClass }: BentoCardProps) => (
+  <motion.div
+    layout
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, scale: 0.95 }}
+    transition={{ duration: 0.4, delay: index * 0.05 }}
+    className={cn('group relative rounded-xl overflow-hidden', sizeClass)}
+  >
+    <Link to={`/works/${work.slug}`} className="absolute inset-0 z-10" aria-label={work.title} />
+    <img
+      src={work.img}
+      alt={work.title}
+      loading="lazy"
+      className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:blur-[3px]"
+    />
+    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/55 transition-colors duration-500" />
+
+    <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-7">
+      <span
+        className={cn(
+          'text-[10px] font-bold uppercase tracking-widest mb-2 transition-colors duration-300',
+          categoryTextColors[work.category]
+        )}
+      >
+        {categoryLabels[work.category]}
+      </span>
+      <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-white leading-snug mb-1">
+        {work.title}
+      </h3>
+      <p className="text-xs md:text-sm text-white/50 font-medium">
+        {work.client} — {work.year}
+      </p>
+      <div className="mt-3 inline-flex items-center text-xs font-bold tracking-wider text-white/70 group-hover:text-white transition-colors duration-300">
+        <ArrowRight className="w-3.5 h-3.5 mr-1.5 transition-transform duration-300 group-hover:translate-x-1" />
+        View Details
+      </div>
+    </div>
+  </motion.div>
+));
+
+BentoCard.displayName = 'BentoCard';
 
 export default Works;

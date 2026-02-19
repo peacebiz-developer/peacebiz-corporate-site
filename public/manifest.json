@@ -1,5 +1,5 @@
 {
-  "short_name": "PeaceBiz",
+  "short_name": "Peace Biz",
   "name": "Peace Biz Corporate Site",
   "icons": [
     {
@@ -13,18 +13,19 @@
       "sizes": "192x192"
     },
     {
-      "src": "favicon_io/apple-icon-180x180.png",
+      "src": "favicon_io/android-icon-144x144.png",
       "type": "image/png",
-      "sizes": "180x180"
+      "sizes": "144x144"
     },
     {
-      "src": "logo512.png",
+      "src": "favicon_io/ms-icon-310x310.png",
       "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
+      "sizes": "310x310"
     }
   ],
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"

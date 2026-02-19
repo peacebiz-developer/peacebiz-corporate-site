@@ -17,7 +17,7 @@ export const MaskTextReveal: React.FC<MaskTextRevealProps> = ({
     style
 }) => {
     return (
-        <div className={`overflow-hidden ${className}`} style={style}>
+        <div className={`overflow-y-clip ${className}`} style={style}>
             <motion.div
                 initial={{ y: direction === 'up' ? "100%" : "-100%" }}
                 whileInView={{ y: 0 }}

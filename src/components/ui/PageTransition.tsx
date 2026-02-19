@@ -1,14 +1,26 @@
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { useLocation } from 'react-router-dom';
 
 const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const location = useLocation();
+    const ref = useRef<HTMLDivElement>(null);
+
+    const handleAnimationComplete = useCallback(() => {
+        const el = ref.current;
+        if (!el) return;
+        // CSS spec: transform/filter values other than "none" create a containing
+        // block for position:fixed descendants, breaking GSAP ScrollTrigger pin.
+        // After entrance animation we reset to "none" so child fixed positioning
+        // is relative to the viewport again.
+        el.style.transform = 'none';
+        el.style.filter = 'none';
+        el.style.willChange = 'auto';
+    }, []);
 
     return (
-        // We handle the AnimatePresence in App.tsx or wrapping Routes, 
-        // but here we define the animation variants for the page content itself.
         <motion.div
+            ref={ref}
             key={location.pathname}
             initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -18,12 +30,9 @@ const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) =
                 ease: [0.22, 1, 0.36, 1]
             }}
             className="w-full"
+            onAnimationComplete={handleAnimationComplete}
         >
             {children}
-            {/* Optional: Add a "Curtain" effect here if requested, 
-            but a smooth fade/blur is often more "premium" and less intrusive. 
-            Let's stick to the high-end fade-up blur for now as it matches the "Apple/Ref" vibe.
-        */}
         </motion.div>
     );
 };

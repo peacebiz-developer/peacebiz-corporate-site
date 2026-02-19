@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://www.peace-biz.com",
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@nextui-org/react": "^2.6.11",
     "@radix-ui/react-hover-card": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.3",
@@ -23,27 +24,51 @@
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "gsap": "^3.14.2",
     "lucide-react": "^0.518.0",
     "motion": "^12.34.0",
     "postcss": "^8.5.6",
     "qss": "^3.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.2",
+    "react-router": "^7.13.0",
+    "react-router-dom": "^7.13.0",
     "react-scripts": "5.0.1",
     "sass": "^1.96.0",
     "shadcn-ui": "^0.9.5",
     "simplex-noise": "^4.0.3",
     "tailwind-merge": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7",
     "three": "^0.182.0",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "set HOST=0.0.0.0&& react-scripts start",
-    "build": "react-scripts build && node scripts/generate-static-routes.js",
+    "build": "node scripts/generate-sitemap.js && react-scripts build && node scripts/generate-static-routes.js",
+    "postbuild": "node scripts/run-react-snap.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "reactSnap": {
+    "include": [
+      "/",
+      "/about",
+      "/company",
+      "/services",
+      "/services/it-solution",
+      "/services/eco-solution",
+      "/services/office-solution",
+      "/works",
+      "/work",
+      "/news",
+      "/contact",
+      "/recruit",
+      "/privacy",
+      "/sitepolicy",
+      "/terms"
+    ],
+    "crawl": false
   },
   "eslintConfig": {
     "extends": [
@@ -65,6 +90,8 @@
   },
   "devDependencies": {
     "@types/three": "^0.182.0",
+    "react-snap": "^1.23.0",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.17"
   }
 }

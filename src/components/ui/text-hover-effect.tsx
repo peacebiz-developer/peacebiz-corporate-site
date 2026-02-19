@@ -8,12 +8,14 @@ export const TextHoverEffect = ({
   duration,
   outline,
   delay: animDelay,
+  centered,
 }: {
   text: string;
   duration?: number;
   automatic?: boolean;
   outline?: boolean;
   delay?: number;
+  centered?: boolean;
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const rafRef = useRef<number | null>(null);
@@ -79,9 +81,9 @@ export const TextHoverEffect = ({
   const fontSize = 250;
 
   const textProps = {
-    x: padding.toString(),
+    x: centered ? (svgWidth / 2).toString() : padding.toString(),
     y: "55%",
-    textAnchor: "start" as const,
+    textAnchor: (centered ? "middle" : "start") as "middle" | "start",
     dominantBaseline: "middle" as const,
     fontFamily: "Inter, Helvetica, Arial, sans-serif",
     fontSize: fontSize,
@@ -113,7 +115,7 @@ export const TextHoverEffect = ({
           }
         }}
         className="select-none block"
-        preserveAspectRatio="xMinYMid meet"
+        preserveAspectRatio={centered ? "xMidYMid meet" : "xMinYMid meet"}
       >
         <defs>
           <linearGradient

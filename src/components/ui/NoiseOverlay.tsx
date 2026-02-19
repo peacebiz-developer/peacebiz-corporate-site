@@ -5,13 +5,17 @@ const NOISE_URI = "data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http:/
 
 export const NoiseOverlay = () => {
     const [useBlendOverlay, setUseBlendOverlay] = useState(true);
+    const [show, setShow] = useState(false);
 
     useEffect(() => {
         const isDesktopHover = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches;
-        // Full-screen mix-blend compositing is expensive on large desktop viewports.
-        // Use normal alpha compositing on desktop while keeping the same noise layer.
         setUseBlendOverlay(!isDesktopHover);
+
+        const timer = setTimeout(() => setShow(true), 7200);
+        return () => clearTimeout(timer);
     }, []);
+
+    if (!show) return null;
 
     return (
         <div
@@ -19,7 +23,7 @@ export const NoiseOverlay = () => {
             style={{
                 backgroundImage: `url("${NOISE_URI}")`,
                 backgroundRepeat: 'repeat',
-                backgroundSize: '128px 128px' // Tiling small texture is faster
+                backgroundSize: '128px 128px',
             }}
         />
     );

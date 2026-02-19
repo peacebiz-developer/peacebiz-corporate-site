@@ -23,6 +23,39 @@ npm run build
 - `npm start`: ローカル開発サーバー起動
 - `npm run build`: 本番ビルド + 静的ルートファイル生成
 
+## Contact Form セキュア構成
+
+GitHub Pages は静的ホスティングのため、フロントエンドに秘密鍵を置く方式は安全ではありません。  
+このリポジトリでは、Contact フォームを以下の構成で運用します。
+
+- フロント: `REACT_APP_CONTACT_API_URL` の公開エンドポイントに送信
+- サーバー側: Cloudflare Worker (`workers/contact-proxy`) が受信
+- 秘密情報: `WEB3FORMS_ACCESS_KEY` は Worker Secret として保持（フロントには一切配布しない）
+- 許可ドメイン: Worker 側の `ALLOWED_ORIGINS` で制限
+
+フロントの設定:
+
+- 参照キー: `REACT_APP_CONTACT_API_URL`
+- ローカル: `.env.production.local` に設定（`.gitignore` 対象）
+- CI/CD: GitHub Repository Secrets の `REACT_APP_CONTACT_API_URL` に設定
+- テンプレート: `.env.production.example`
+
+```bash
+cp .env.production.example .env.production.local
+```
+
+Worker デプロイ例:
+
+```bash
+cd workers/contact-proxy
+npx wrangler secret put WEB3FORMS_ACCESS_KEY
+npx wrangler secret put ALLOWED_ORIGINS
+npx wrangler deploy
+```
+
+- `ALLOWED_ORIGINS` 例: `https://www.peace-biz.com,https://peace-biz-corporate-site.pages.dev`
+- 公開された Worker URL を `REACT_APP_CONTACT_API_URL` に設定してください。
+
 ## デプロイ
 
 `main` ブランチへの push で `.github/workflows/deploy-github-pages.yml` が実行され、GitHub Pages に自動反映されます。
@@ -33,6 +66,10 @@ npm run build
 2. `CI=false npm run build`
 3. `build/` を Pages Artifact としてアップロード
 4. GitHub Pages へデプロイ
+
+補足:
+- ワークフローは `REACT_APP_CONTACT_API_URL` と `REACT_APP_WEB3FORMS_ACCESS_KEY` の両方が未設定の場合に失敗します。
+- 互換運用として `REACT_APP_WEB3FORMS_ACCESS_KEY` でもビルド可能ですが、これはキーがフロントに露出するため本番では非推奨です。
 
 ## ルーティングと GitHub Pages 対応
 
@@ -50,11 +87,20 @@ SPA の直接アクセス（例: `/works`）で 404 を防ぐために、以下�
 - `/services/eco-solution`
 - `/services/office-solution`
 - `/works` `/work`
+- `/works/:slug` `/work/:slug`
 - `/news`
+- `/news/:slug`
 - `/contact`
 - `/recruit`
 - `/privacy`
 - `/sitepolicy` `/terms`
+
+コンテンツデータ:
+
+- `src/data/content/news.json`
+- `src/data/content/works.json`
+
+一覧ページはページネーションを実装しています。`NEWS_PAGE_SIZE` / `WORKS_PAGE_SIZE` で件数を調整できます。
 
 ## SEO / Search Console
 

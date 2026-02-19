@@ -108,6 +108,12 @@ const EcoSolution: React.FC = () => {
     const txtOps = [txt0Op, txt1Op, txt2Op];
     const txtYs = [txt0Y, txt1Y, txt2Y];
 
+    // Disable pointer events on invisible showcase cards so they don't block clicks
+    const pe0 = useTransform(txt0Op, (v: number) => v > 0.1 ? 'auto' : 'none');
+    const pe1 = useTransform(txt1Op, (v: number) => v > 0.1 ? 'auto' : 'none');
+    const pe2 = useTransform(txt2Op, (v: number) => v > 0.1 ? 'auto' : 'none');
+    const txtPes = [pe0, pe1, pe2];
+
     return (
         <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
 
@@ -118,7 +124,7 @@ const EcoSolution: React.FC = () => {
                 {/* Background image (底面) */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src={`${process.env.PUBLIC_URL || ''}/ecosolution.webp`}
+                        src={`${process.env.PUBLIC_URL || ''}/eco-solution.webp`}
                         alt=""
                         className="w-full h-full object-cover"
                         loading="eager"
@@ -384,7 +390,7 @@ const EcoSolution: React.FC = () => {
                                     <motion.div
                                         key={svc.num}
                                         className={i === 0 ? 'relative' : 'absolute top-0 left-0 w-full'}
-                                        style={{ opacity: txtOps[i] }}
+                                        style={{ opacity: txtOps[i], pointerEvents: txtPes[i] } as any}
                                     >
                                         <motion.div style={{ y: txtYs[i] }}>
                                             {/* Number + subtitle */}

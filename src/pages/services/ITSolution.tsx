@@ -111,6 +111,12 @@ const ITSolution: React.FC = () => {
     const txtOps = [txt0Op, txt1Op, txt2Op];
     const txtYs = [txt0Y, txt1Y, txt2Y];
 
+    // Disable pointer events on invisible showcase cards so they don't block clicks
+    const pe0 = useTransform(txt0Op, (v: number) => v > 0.1 ? 'auto' : 'none');
+    const pe1 = useTransform(txt1Op, (v: number) => v > 0.1 ? 'auto' : 'none');
+    const pe2 = useTransform(txt2Op, (v: number) => v > 0.1 ? 'auto' : 'none');
+    const txtPes = [pe0, pe1, pe2];
+
     return (
         <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white">
 
@@ -121,7 +127,7 @@ const ITSolution: React.FC = () => {
                 {/* Background image (底面) */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop"
+                        src={`${process.env.PUBLIC_URL || ''}/it-solution.webp`}
                         alt=""
                         className="w-full h-full object-cover"
                         loading="eager"
@@ -387,7 +393,7 @@ const ITSolution: React.FC = () => {
                                     <motion.div
                                         key={svc.num}
                                         className={i === 0 ? 'relative' : 'absolute top-0 left-0 w-full'}
-                                        style={{ opacity: txtOps[i] }}
+                                        style={{ opacity: txtOps[i], pointerEvents: txtPes[i] } as any}
                                     >
                                         <motion.div style={{ y: txtYs[i] }}>
                                             {/* Number + subtitle */}

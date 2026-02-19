@@ -1,26 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const { getPrerenderRoutes } = require('./route-manifest');
 
 const buildDir = path.resolve(__dirname, '..', 'build');
 const sourceIndex = path.join(buildDir, 'index.html');
-
-const routes = [
-  '/about',
-  '/company',
-  '/services',
-  '/services/it-solution',
-  '/services/eco-solution',
-  '/services/office-solution',
-  '/works',
-  '/work',
-  '/news',
-  '/contact',
-  '/recruit',
-  '/privacy',
-  '/sitepolicy',
-  '/terms',
-  '/sparkles-demo',
-];
+const routes = getPrerenderRoutes().filter((route) => route !== '/');
 
 if (!fs.existsSync(sourceIndex)) {
   throw new Error(`index.html not found: ${sourceIndex}`);

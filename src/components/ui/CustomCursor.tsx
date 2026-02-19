@@ -71,12 +71,13 @@ export const CustomCursor = () => {
 
     return (
         <motion.div
-            className="fixed top-0 left-0 w-4 h-4 bg-brand-blue/80 rounded-full pointer-events-none z-[10000] hidden md:block shadow-[0_0_8px_rgba(0,107,182,0.5)]"
+            className="fixed top-0 left-0 w-4 h-4 bg-brand-blue/95 rounded-full pointer-events-none z-[10000] hidden md:block shadow-[0_0_8px_rgba(0,107,182,0.5)]"
             style={{
                 x: mouseX,
                 y: mouseY,
                 translateX: '-50%',
                 translateY: '-50%',
+                opacity: 0.95,
             }}
             animate={{
                 scale: isHovering ? 2.5 : 1,
