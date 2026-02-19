@@ -24,7 +24,7 @@ const AnimatedBlobImage: React.FC<AnimatedBlobImageProps> = ({
           src={src}
           alt={i === currentIndex ? alt : ""}
           className={cn(
-            "absolute inset-0 w-full h-full object-cover transition-opacity duration-[1500ms] ease-in-out",
+            "absolute inset-0 w-full h-full object-cover transition-opacity [transition-duration:1500ms] ease-in-out",
             i === currentIndex ? "opacity-100" : "opacity-0",
           )}
           style={{ clipPath: `url(#blob-clip-${id})` }}

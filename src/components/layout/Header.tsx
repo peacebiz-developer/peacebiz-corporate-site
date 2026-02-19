@@ -36,8 +36,8 @@ const PreviewItem: React.FC<{
   compact?: boolean;
 }> = ({ item, onSelect, compact = false }) => {
   const frameClass = compact
-    ? 'rounded-lg border border-white/45 bg-white/35 hover:bg-white/55 backdrop-blur-xl transition-colors p-2.5'
-    : 'rounded-xl border border-white/50 bg-white/30 hover:bg-white/52 backdrop-blur-xl transition-colors p-3';
+    ? 'rounded-lg border border-white/90 bg-white/92 hover:bg-white backdrop-blur-xl transition-colors p-2.5'
+    : 'rounded-xl border border-white/90 bg-white/94 hover:bg-white backdrop-blur-xl transition-colors p-3';
   const imageClass = compact ? 'h-12 w-20' : 'h-16 w-24';
   const titleClass = compact ? 'text-sm' : 'text-sm md:text-base';
 
@@ -53,7 +53,7 @@ const PreviewItem: React.FC<{
           />
           <div className="min-w-0">
             <p className={`font-bold text-black ${titleClass}`}>{item.title}</p>
-            <p className="text-xs text-black/50 leading-relaxed line-clamp-2">
+            <p className="text-xs text-black/70 leading-relaxed line-clamp-2">
               {item.description}
             </p>
           </div>
@@ -62,7 +62,7 @@ const PreviewItem: React.FC<{
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className={`font-bold text-black ${titleClass}`}>{item.title}</p>
-            <p className="text-xs text-black/50 leading-relaxed line-clamp-2">
+            <p className="text-xs text-black/70 leading-relaxed line-clamp-2">
               {item.description}
             </p>
           </div>
