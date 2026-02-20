@@ -120,8 +120,8 @@ const Header: React.FC = () => {
               { title: 'Hero', description: 'ファーストビューへ', to: '/#top-hero' },
               { title: 'Mission', description: 'ミッションセクションへ', to: '/#top-mission' },
               { title: "Owner's Voice", description: '導入の声セクションへ', to: '/#top-voice' },
-              { title: 'Core Business', description: '事業領域へ', to: '/#top-core-business' },
-              { title: 'Latest News', description: '最新ニュースへ', to: '/#top-news' },
+              { title: 'Domain', description: '事業領域へ', to: '/#top-domain' },
+              { title: 'Latest News', description: '最新ニュースへ', to: '/#top-news-heading' },
             ],
           },
         ],
@@ -230,6 +230,7 @@ const Header: React.FC = () => {
           {
             label: 'SECTIONS',
             items: [
+              { title: 'Recruit Top', description: '採用ページトップへ', to: '/recruit#recruit-hero' },
               { title: 'Message', description: 'メッセージセクションへ', to: '/recruit#recruit-message' },
               { title: 'Benefits', description: '制度・福利厚生へ', to: '/recruit#recruit-benefits' },
               { title: 'Requirements', description: '募集要項へ', to: '/recruit#recruit-requirements' },

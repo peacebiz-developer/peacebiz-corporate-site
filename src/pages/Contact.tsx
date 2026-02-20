@@ -2,7 +2,9 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Phone, Send, CheckCircle, Mail, MapPin, ArrowRight } from 'lucide-react';
 import { Checkbox } from "@nextui-org/react";
+import { Link } from 'react-router-dom';
 import { MaskTextReveal } from '../components/ui/MaskTextReveal';
+import { NeonCheckbox } from '../components/ui/NeonCheckbox';
 
 const CONTACT_API_ENDPOINT = (process.env.REACT_APP_CONTACT_API_URL || '').trim();
 const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
@@ -373,7 +375,7 @@ const Contact: React.FC = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen relative bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center overflow-hidden text-white">
+      <div className="min-h-screen relative bg-gradient-to-br from-[#fdfdfa] via-[#fbfbf8] to-[#f7f7f2] flex items-center justify-center overflow-hidden text-neutral-900">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -388,7 +390,7 @@ const Contact: React.FC = () => {
             <CheckCircle className="w-12 h-12 text-brand-green" />
           </motion.div>
           <h2 className="text-5xl font-black mb-6 tracking-tighter">THANK YOU</h2>
-          <p className="text-white/60 mb-10 max-w-md mx-auto text-lg leading-relaxed">
+          <p className="text-neutral-600 mb-10 max-w-md mx-auto text-lg leading-relaxed">
             お問い合わせありがとうございます。<br />
             内容を確認の上、担当者より2営業日以内にご連絡いたします。
           </p>
@@ -399,7 +401,7 @@ const Contact: React.FC = () => {
               setHoneypot('');
               formInitializedAtRef.current = Date.now();
             }}
-            className="px-8 py-4 bg-white/10 border border-white/20 text-white font-bold rounded-full hover:bg-white/15 transition-all"
+            className="px-8 py-4 bg-white border border-black/10 text-neutral-900 font-bold rounded-full hover:bg-neutral-50 transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -411,12 +413,12 @@ const Contact: React.FC = () => {
   }
 
   return (
-    <div ref={containerRef} className="min-h-screen relative bg-gradient-to-b from-gray-950 via-gray-900 to-neutral-950 text-white overflow-x-hidden selection:bg-white selection:text-black">
+    <div ref={containerRef} className="min-h-screen relative bg-gradient-to-b from-[#fdfdfa] via-[#fbfbf8] to-[#f6f6f1] text-neutral-900 overflow-x-hidden selection:bg-brand-blue selection:text-white">
 
       {/* Animated Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-brand-blue/[0.06] via-brand-green/[0.04] to-brand-orange/[0.06]"
+          className="absolute inset-0 bg-gradient-to-br from-brand-blue/[0.08] via-brand-green/[0.05] to-brand-orange/[0.07]"
           animate={{ backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'] }}
           transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
           style={{ backgroundSize: '400% 400%' }}
@@ -434,7 +436,7 @@ const Contact: React.FC = () => {
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-px h-40 bg-gradient-to-b from-transparent via-white/15 to-transparent"
+            className="absolute w-px h-40 bg-gradient-to-b from-transparent via-black/10 to-transparent"
             style={{ left: `${20 + (i * 15)}%`, top: `${25 + (i * 8)}%`, transform: `rotate(${30 + i * 20}deg)` }}
             animate={{ opacity: [0.15, 0.6, 0.15], scaleY: [1, 1.5, 1] }}
             transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
@@ -446,7 +448,7 @@ const Contact: React.FC = () => {
       {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
-          className="fixed w-1.5 h-1.5 bg-white/15 rounded-full pointer-events-none z-0"
+          className="fixed w-1.5 h-1.5 bg-black/10 rounded-full pointer-events-none z-0"
           style={{ left: `${10 + (i * 12)}%`, top: `${20 + (i * 10)}%` }}
           animate={{ y: [0, -40, 0], opacity: [0.15, 0.6, 0.15], scale: [1, 1.8, 1] }}
           transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.6 }}
@@ -456,7 +458,7 @@ const Contact: React.FC = () => {
       {/* Hero Section */}
       <section id="contact-hero" className="relative z-10 pt-40 pb-16 px-6 md:px-16 lg:px-24 overflow-hidden scroll-mt-28">
         <div className="inline-flex flex-col items-start">
-          <MaskTextReveal text="問い合わせ" className="text-lg md:text-xl font-bold tracking-widest text-white/50 mb-4 whitespace-nowrap" />
+          <MaskTextReveal text="問い合わせ" className="text-lg md:text-xl font-bold tracking-widest text-neutral-600 mb-4 whitespace-nowrap" />
           <h1 className="text-[clamp(3.1rem,11vw,8rem)] font-black leading-none tracking-tighter mb-6 whitespace-nowrap">
             <MaskTextReveal text="GET IN TOUCH" delay={0.05} />
           </h1>
@@ -465,7 +467,7 @@ const Contact: React.FC = () => {
 
       {/* Divider */}
       <div className="px-6 md:px-16 lg:px-24">
-        <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="h-px bg-gradient-to-r from-transparent via-black/10 to-transparent" />
       </div>
 
       {/* Main Content: Split Layout */}
@@ -483,14 +485,17 @@ const Contact: React.FC = () => {
           <div className="lg:sticky lg:top-32">
             <div className="mb-6 text-center">
               <h3 className="text-2xl font-black tracking-tight mb-1">オフィス</h3>
-              <p className="text-white/40 text-sm">お近くの拠点までお気軽にどうぞ。</p>
+              <p className="text-neutral-600 text-sm">お近くの拠点までお気軽にどうぞ。</p>
             </div>
 
             <div className="space-y-4">
               {offices.map((office, idx) => (
                 <motion.div
                   key={idx}
-                  className="p-5 bg-white/[0.05] backdrop-blur-sm rounded-2xl border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.15] transition-all group"
+                  className="p-5 bg-white backdrop-blur-sm rounded-2xl border border-brand-blue/[0.14] hover:border-brand-blue/[0.24] transition-all group"
+                  style={{
+                    backgroundImage: 'radial-gradient(130% 130% at 0% 0%, rgba(0, 107, 182, 0.10) 0%, rgba(0, 107, 182, 0.035) 20%, rgba(255,255,255,0) 45%)'
+                  }}
                   variants={fadeInUp}
                   whileHover={{ y: -3 }}
                 >
@@ -499,17 +504,17 @@ const Contact: React.FC = () => {
                       <MapPin className="w-4 h-4 text-brand-blue" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">{office.location}</span>
-                      <h4 className="text-base font-bold text-white mt-0.5 mb-1.5">{office.name}</h4>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">{office.location}</span>
+                      <h4 className="text-base font-bold text-neutral-900 mt-0.5 mb-1.5">{office.name}</h4>
                       <a
                         href={office.mapUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white/50 text-sm mb-2 leading-relaxed hover:text-brand-blue transition-colors block"
+                        className="text-neutral-600 text-sm mb-2 leading-relaxed hover:text-brand-blue transition-colors block"
                       >
                         {office.address}
                       </a>
-                      <a href={`tel:${office.phone}`} className="inline-flex items-center gap-2 text-white text-sm font-bold hover:text-brand-blue transition-colors">
+                      <a href={`tel:${office.phone}`} className="inline-flex items-center gap-2 text-neutral-900 text-sm font-bold hover:text-brand-blue transition-colors">
                         <Phone className="w-3.5 h-3.5" /> {office.phone}
                       </a>
                     </div>
@@ -520,19 +525,22 @@ const Contact: React.FC = () => {
               {/* Common Email */}
               <motion.a
                 href="mailto:contact@peace-biz.com"
-                className="block p-5 bg-white/[0.05] backdrop-blur-sm rounded-2xl border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.15] transition-all group"
+                className="block p-5 bg-white backdrop-blur-sm rounded-2xl border border-brand-orange/[0.14] hover:border-brand-orange/[0.24] transition-all group"
+                style={{
+                  backgroundImage: 'radial-gradient(130% 130% at 0% 0%, rgba(234, 87, 18, 0.10) 0%, rgba(234, 87, 18, 0.035) 20%, rgba(255,255,255,0) 45%)'
+                }}
                 variants={fadeInUp}
                 whileHover={{ y: -3 }}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-brand-blue/20 border border-brand-blue/30 flex items-center justify-center shrink-0">
-                    <Mail className="w-4 h-4 text-brand-blue" />
+                  <div className="w-10 h-10 rounded-xl bg-brand-orange/20 border border-brand-orange/30 flex items-center justify-center shrink-0">
+                    <Mail className="w-4 h-4 text-brand-orange" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">COMMON</span>
-                    <h4 className="text-base font-bold text-white mt-0.5 mb-1.5">共通メール窓口</h4>
-                    <p className="text-white/50 text-sm leading-relaxed mb-2">お問い合わせはこちらまで</p>
-                    <span className="text-white text-sm font-bold break-all group-hover:text-brand-blue transition-colors">contact@peace-biz.com</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">COMMON</span>
+                    <h4 className="text-base font-bold text-neutral-900 mt-0.5 mb-1.5">共通メール窓口</h4>
+                    <p className="text-neutral-600 text-sm leading-relaxed mb-2">お問い合わせはこちらまで</p>
+                    <span className="text-neutral-900 text-sm font-bold break-all group-hover:text-brand-blue transition-colors">contact@peace-biz.com</span>
                   </div>
                 </div>
               </motion.a>
@@ -540,14 +548,17 @@ const Contact: React.FC = () => {
 
             {/* Urgent Info */}
             <motion.div
-              className="p-5 bg-brand-blue/15 border border-brand-blue/25 backdrop-blur-sm rounded-2xl mt-4"
+              className="p-5 bg-white border border-brand-green/[0.14] hover:border-brand-green/[0.24] backdrop-blur-sm rounded-2xl mt-4 transition-all"
+              style={{
+                backgroundImage: 'radial-gradient(130% 130% at 0% 0%, rgba(16, 140, 96, 0.10) 0%, rgba(16, 140, 96, 0.035) 20%, rgba(255,255,255,0) 45%)'
+              }}
               variants={fadeInUp}
             >
-              <h4 className="text-sm font-bold text-white mb-1.5">お急ぎの場合</h4>
-              <p className="text-white/60 text-sm leading-relaxed">
+              <h4 className="text-sm font-bold text-neutral-900 mb-1.5">お急ぎの場合</h4>
+              <p className="text-neutral-700 text-sm leading-relaxed">
                 最寄りの支店まで直接お電話にてお問い合わせください。
               </p>
-              <span className="text-white/35 text-xs mt-2 block">平日10:00 - 18:00（土日祝除く）</span>
+              <span className="text-neutral-600 text-xs mt-2 block">平日10:00 - 18:00（土日祝除く）</span>
             </motion.div>
           </div>
         </motion.div>
@@ -556,11 +567,11 @@ const Contact: React.FC = () => {
         <motion.div className="w-full lg:w-[62%] order-1 lg:order-2" variants={fadeInUp}>
           <div className="mb-6 text-center">
             <h2 className="text-2xl font-black tracking-tight mb-1">お問い合わせフォーム</h2>
-            <p className="text-white/40 text-sm">内容をご記入の上、送信してください。</p>
+            <p className="text-neutral-600 text-sm">内容をご記入の上、送信してください。</p>
           </div>
 
           {/* Form Card */}
-          <div className="p-6 md:p-10 bg-white/[0.04] backdrop-blur-sm rounded-3xl border border-white/[0.08]">
+          <div className="p-6 md:p-10 bg-white/80 backdrop-blur-sm rounded-3xl border border-black/[0.08]">
             <form onSubmit={handleSubmit} className="space-y-10">
               <input
                 type="text"
@@ -575,7 +586,7 @@ const Contact: React.FC = () => {
 
               {/* Inquiry Type */}
               <div className="space-y-4">
-                <label className="text-xs font-bold uppercase tracking-widest text-white/40">お問い合わせ種別 <span className="text-brand-orange">*</span></label>
+                <label className="text-xs font-bold uppercase tracking-widest text-neutral-600">お問い合わせ種別 <span className="text-brand-orange">*</span></label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {inquiryTypes.map((type) => (
                     <motion.button
@@ -584,8 +595,8 @@ const Contact: React.FC = () => {
                       onClick={() => setFormData({ ...formData, inquiryType: type.key, services: [] })}
                       className={`relative p-4 rounded-xl border text-left transition-all duration-300 ${
                         formData.inquiryType === type.key
-                          ? 'border-brand-blue bg-brand-blue/20 text-white'
-                          : 'border-white/[0.1] text-white/50 hover:border-white/25 bg-white/[0.03]'
+                          ? 'border-brand-blue bg-brand-blue/20 text-neutral-700'
+                          : 'border-black/[0.1] text-neutral-700 hover:border-black/25 bg-white/70'
                       }`}
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
@@ -608,7 +619,7 @@ const Contact: React.FC = () => {
                     exit={{ opacity: 0, height: 0, y: -20 }}
                     className="overflow-hidden"
                   >
-                    <div className="p-6 bg-white/[0.03] border border-white/[0.06] rounded-2xl space-y-6">
+                    <div className="p-6 bg-white/70 border border-black/[0.06] rounded-2xl space-y-6">
                       {Object.entries(serviceOptions).map(([key, category]) => (
                         <div key={key}>
                           <p className={`text-xs font-bold mb-3 uppercase tracking-widest ${category.color} flex items-center gap-2`}>
@@ -617,7 +628,7 @@ const Contact: React.FC = () => {
                           </p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
                             {category.items.map((item) => (
-                              <label key={item.key} className="flex items-center space-x-3 cursor-pointer group p-2 -ml-2 rounded-lg hover:bg-white/[0.05] transition-colors">
+                              <label key={item.key} className="flex items-center space-x-3 cursor-pointer group p-2 -ml-2 rounded-lg hover:bg-black/[0.03] transition-colors">
                                 <Checkbox
                                   value={item.key}
                                   size="sm"
@@ -633,7 +644,7 @@ const Contact: React.FC = () => {
                                   }}
                                   classNames={{ wrapper: "group-hover:scale-110 transition-transform" }}
                                 >
-                                  <span className="text-sm font-medium text-white/60 group-hover:text-white transition-colors">{item.label}</span>
+                                  <span className="text-sm font-medium text-neutral-700 group-hover:text-neutral-900 transition-colors">{item.label}</span>
                                 </Checkbox>
                               </label>
                             ))}
@@ -649,10 +660,10 @@ const Contact: React.FC = () => {
               <div className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="group space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-widest text-white/40 group-focus-within:text-brand-blue transition-colors">お名前<span className="text-brand-orange">*</span></label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-neutral-600 group-focus-within:text-brand-blue transition-colors">お名前<span className="text-brand-orange">*</span></label>
                     <input
                       type="text"
-                      className="w-full bg-transparent border-b border-white/15 py-3 text-base font-medium text-white focus:border-brand-blue focus:outline-none transition-colors placeholder:text-white/25"
+                      className="w-full bg-transparent border-b border-black/15 py-3 text-base font-medium text-neutral-900 focus:border-brand-blue focus:outline-none transition-colors placeholder:text-neutral-400"
                       placeholder="平和 太郎"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -661,10 +672,10 @@ const Contact: React.FC = () => {
                     />
                   </div>
                   <div className="group space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-widest text-white/40 group-focus-within:text-brand-blue transition-colors">会社または店舗名</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-neutral-600 group-focus-within:text-brand-blue transition-colors">会社または店舗名</label>
                     <input
                       type="text"
-                      className="w-full bg-transparent border-b border-white/15 py-3 text-base font-medium text-white focus:border-brand-blue focus:outline-none transition-colors placeholder:text-white/25"
+                      className="w-full bg-transparent border-b border-black/15 py-3 text-base font-medium text-neutral-900 focus:border-brand-blue focus:outline-none transition-colors placeholder:text-neutral-400"
                       placeholder="株式会社ピース・ビズ"
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
@@ -675,10 +686,10 @@ const Contact: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="group space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-widest text-white/40 group-focus-within:text-brand-blue transition-colors">メールアドレス<span className="text-brand-orange">*</span></label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-neutral-600 group-focus-within:text-brand-blue transition-colors">メールアドレス<span className="text-brand-orange">*</span></label>
                     <input
                       type="email"
-                      className="w-full bg-transparent border-b border-white/15 py-3 text-base font-medium text-white focus:border-brand-blue focus:outline-none transition-colors placeholder:text-white/25"
+                      className="w-full bg-transparent border-b border-black/15 py-3 text-base font-medium text-neutral-900 focus:border-brand-blue focus:outline-none transition-colors placeholder:text-neutral-400"
                       placeholder="info@example.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -687,10 +698,10 @@ const Contact: React.FC = () => {
                     />
                   </div>
                   <div className="group space-y-3">
-                    <label className="text-xs font-bold uppercase tracking-widest text-white/40 group-focus-within:text-brand-blue transition-colors">電話番号</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-neutral-600 group-focus-within:text-brand-blue transition-colors">電話番号</label>
                     <input
                       type="tel"
-                      className="w-full bg-transparent border-b border-white/15 py-3 text-base font-medium text-white focus:border-brand-blue focus:outline-none transition-colors placeholder:text-white/25"
+                      className="w-full bg-transparent border-b border-black/15 py-3 text-base font-medium text-neutral-900 focus:border-brand-blue focus:outline-none transition-colors placeholder:text-neutral-400"
                       placeholder="03-1234-5678"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -702,9 +713,9 @@ const Contact: React.FC = () => {
 
               {/* Message */}
               <div className="group space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-white/40 group-focus-within:text-brand-blue transition-colors">お問い合わせ内容<span className="text-brand-orange">*</span></label>
+                <label className="text-xs font-bold uppercase tracking-widest text-neutral-600 group-focus-within:text-brand-blue transition-colors">お問い合わせ内容<span className="text-brand-orange">*</span></label>
                 <textarea
-                  className="w-full bg-transparent border-b border-white/15 py-3 text-base text-white focus:border-brand-blue focus:outline-none transition-colors placeholder:text-white/25 min-h-[150px] resize-none"
+                  className="w-full bg-transparent border-b border-black/15 py-3 text-base text-neutral-900 focus:border-brand-blue focus:outline-none transition-colors placeholder:text-neutral-400 min-h-[150px] resize-none"
                   placeholder="ご質問・ご要望など"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -715,11 +726,15 @@ const Contact: React.FC = () => {
 
               {/* Privacy */}
               <div className="flex justify-center">
-                <Checkbox size="sm" color="default">
-                  <span className="text-sm text-white/50">
-                    <a href="https://www.peace-biz.com/privacy" className="underline decoration-white/20 underline-offset-4 hover:text-white transition-colors">プライバシーポリシー</a> に同意します
+                <div className="-ml-2 flex items-center gap-3">
+                  <NeonCheckbox size={24} aria-label="プライバシーポリシーに同意します" />
+                  <span className="text-sm text-neutral-600">
+                    <Link to="/privacy" className="underline decoration-black/30 underline-offset-4 hover:text-brand-blue transition-colors">
+                      プライバシーポリシー
+                    </Link>{' '}
+                    に同意します
                   </span>
-                </Checkbox>
+                </div>
               </div>
 
               {/* Submit */}
@@ -764,7 +779,7 @@ const Contact: React.FC = () => {
                     </p>
                     <a
                       href={mailtoFallbackHref}
-                      className="mt-3 inline-flex items-center justify-center rounded-full border border-white/20 px-4 py-2 text-xs font-bold tracking-widest text-white/70 hover:text-white hover:border-white/40 transition-colors"
+                      className="mt-3 inline-flex items-center justify-center rounded-full border border-black/20 px-4 py-2 text-xs font-bold tracking-widest text-neutral-700 hover:text-neutral-900 hover:border-black/40 transition-colors"
                     >
                       メールアプリで問い合わせる
                     </a>
@@ -778,7 +793,7 @@ const Contact: React.FC = () => {
       </motion.section>
 
       {/* Smooth transition to footer */}
-      <div className="relative z-10 h-40 bg-gradient-to-b from-transparent to-neutral-950 pointer-events-none" />
+      <div className="relative z-10 h-64 md:h-80 bg-gradient-to-b from-transparent via-[#f9f9f5] to-white pointer-events-none" />
     </div>
   );
 };

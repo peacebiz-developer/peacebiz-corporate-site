@@ -52,6 +52,9 @@ export default function ScrollToTop() {
   }, [routeKey]);
 
   useLayoutEffect(() => {
+    let cancelled = false;
+    const timeoutIds: number[] = [];
+
     const scrollToHashTarget = (hash: string) => {
       const targetId = decodeURIComponent(hash.replace('#', ''));
       if (!targetId) {
@@ -59,18 +62,53 @@ export default function ScrollToTop() {
         return;
       }
 
+      const resolveTarget = (id: string): HTMLElement | null => {
+        // Keep legacy hash compatibility while preferring precise anchor positions.
+        if (id === 'top-news') {
+          return document.getElementById('top-news-heading') || document.getElementById(id);
+        }
+        return document.getElementById(id);
+      };
+
+      const scrollToElement = (element: HTMLElement) => {
+        const fixedHeaderOffset = 112;
+        const top = Math.max(
+          0,
+          element.getBoundingClientRect().top + window.scrollY - fixedHeaderOffset
+        );
+        window.scrollTo({ top, left: 0, behavior: 'auto' });
+      };
+
+      const scheduleStabilizedScrolls = () => {
+        const settleDelays = [0, 140, 320, 680];
+        settleDelays.forEach((delay) => {
+          const id = window.setTimeout(() => {
+            if (cancelled) return;
+            const target = resolveTarget(targetId);
+            if (target) {
+              scrollToElement(target);
+            }
+          }, delay);
+          timeoutIds.push(id);
+        });
+      };
+
       let attemptCount = 0;
-      const maxAttempts = 12;
+      const maxAttempts = 120;
       const tryScrollToHash = () => {
-        const target = document.getElementById(targetId);
+        if (cancelled) return;
+
+        const target = resolveTarget(targetId);
         if (target) {
-          target.scrollIntoView({ block: 'start', behavior: 'auto' });
+          scrollToElement(target);
+          scheduleStabilizedScrolls();
           return;
         }
 
         attemptCount += 1;
         if (attemptCount < maxAttempts) {
-          requestAnimationFrame(tryScrollToHash);
+          const id = window.setTimeout(tryScrollToHash, 16);
+          timeoutIds.push(id);
           return;
         }
 
@@ -96,10 +134,18 @@ export default function ScrollToTop() {
 
     if (location.hash) {
       scrollToHashTarget(location.hash);
-      return;
+      return () => {
+        cancelled = true;
+        timeoutIds.forEach((id) => window.clearTimeout(id));
+      };
     }
 
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+    return () => {
+      cancelled = true;
+      timeoutIds.forEach((id) => window.clearTimeout(id));
+    };
   }, [location.hash, navigationType, routeKey]);
 
   return null;

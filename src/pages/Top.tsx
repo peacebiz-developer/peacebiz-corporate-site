@@ -291,7 +291,7 @@ const Top: React.FC = () => {
       </section>
 
       {/* 3. BUSINESS DOMAINS: Bento Grid */}
-      <section id="top-core-business" className="relative bg-white content-auto overflow-hidden scroll-mt-28">
+      <section id="top-domain" className="relative bg-white content-auto overflow-hidden scroll-mt-28">
         <div className="relative">
           {/* DOMAINS Title — right-aligned */}
           <div className="pr-3 md:pr-4 lg:pr-6 pt-24 md:pt-36 pb-4 md:pb-6 text-right">
@@ -468,11 +468,12 @@ const Top: React.FC = () => {
         <div className="container mx-auto px-6 md:px-16">
           {/* Header Row: LATEST NEWS (left) — VIEW ARCHIVES (right) */}
           <motion.div
+            id="top-news-heading"
+            className="scroll-mt-28 flex items-end justify-between mb-6"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-end justify-between mb-6"
           >
             <h2 className="text-3xl md:text-4xl font-black tracking-tight">LATEST NEWS</h2>
             <MagneticButton>
