@@ -81,35 +81,37 @@ const NewsDetail: React.FC = () => {
         />
       )}
 
-      <section className="container mx-auto px-6 md:px-20 pt-6 md:pt-8 pb-14">
-        <Link
-          to="/news"
-          className="inline-flex items-center gap-2 text-sm font-bold tracking-widest uppercase text-gray-400 hover:text-black dark:hover:text-white transition-colors mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          News Archive
-        </Link>
+      <section className="container mx-auto px-6 md:px-20 pt-8 md:pt-10 pb-14">
+        <div className="max-w-5xl mx-auto">
+          <Link
+            to="/news"
+            className="inline-flex items-center gap-2 text-sm font-bold tracking-widest uppercase text-gray-400 hover:text-black dark:hover:text-white transition-colors mb-8"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            News Archive
+          </Link>
 
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/15 bg-black/[0.02] dark:bg-white/[0.04] px-4 py-2 text-sm text-gray-500 dark:text-gray-300 font-mono">
-            <Calendar className="w-4 h-4" />
-            {news.date}
+          <div className="flex flex-wrap items-center gap-4 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/15 bg-black/[0.02] dark:bg-white/[0.04] px-4 py-2 text-sm text-gray-500 dark:text-gray-300 font-mono">
+              <Calendar className="w-4 h-4" />
+              {news.date}
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/15 bg-black/[0.02] dark:bg-white/[0.04] px-3 py-2">
+              <Tag className="w-3.5 h-3.5 text-gray-400" />
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider ${
+                  catColorMap[news.cat] || 'bg-gray-600'
+                }`}
+              >
+                {news.cat}
+              </span>
+            </div>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/15 bg-black/[0.02] dark:bg-white/[0.04] px-3 py-2">
-            <Tag className="w-3.5 h-3.5 text-gray-400" />
-            <span
-              className={`inline-block px-3 py-1 rounded-full text-white text-xs font-bold uppercase tracking-wider ${
-                catColorMap[news.cat] || 'bg-gray-600'
-              }`}
-            >
-              {news.cat}
-            </span>
-          </div>
+
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+            {news.title}
+          </h1>
         </div>
-
-        <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight max-w-5xl">
-          {news.title}
-        </h1>
       </section>
 
       <section className="container mx-auto px-6 md:px-20 pb-24">

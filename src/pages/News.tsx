@@ -128,7 +128,7 @@ const News: React.FC = () => {
                   delay: index * 0.06,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="sm:col-span-12 lg:col-span-10 lg:col-start-2"
+                className="sm:col-span-12"
               >
                 <Link to={`/news/${news.slug}`} className="block">
                   <Card className="group border-0 bg-transparent shadow-none cursor-pointer">
