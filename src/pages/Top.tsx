@@ -429,7 +429,7 @@ const Top: React.FC = () => {
                   accentColor="text-brand-blue"
                 />
               </a>
-              <Link to="/services/eco-solution">
+              <Link to="/services/eco-solution/commercial-aircon">
                 <DomainBentoCard
                   title="業務用エアコン"
                   description="最新の省エネ技術で、快適な空間環境と大幅なコスト削減を実現します。"

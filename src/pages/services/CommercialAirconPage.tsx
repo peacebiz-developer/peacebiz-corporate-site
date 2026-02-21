@@ -1,23 +1,20 @@
-import React, { useLayoutEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import React, { useLayoutEffect, useState, useCallback } from 'react';
+import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import {
   type LucideIcon,
   AlertTriangle,
   ArrowRight,
   ArrowUpRight,
+  Building2,
   ChevronDown,
   ChevronRight,
   ClipboardList,
-  Command,
-  Gem,
-  Ghost,
-  Hexagon,
+  FileCheck,
   Phone,
   Scale,
   Settings,
   ShieldCheck,
   Star,
-  Triangle,
   Truck,
   Wind,
   Wrench,
@@ -26,7 +23,9 @@ import {
 import { Link } from 'react-router-dom';
 import { MaskTextReveal } from '../../components/ui/MaskTextReveal';
 import { MagneticButton } from '../../components/ui/MagneticButton';
-import { GlowingEffect } from '../../components/ui/glowing-effect';
+import { Marquee } from '../../components/ui/Marquee';
+import { MasonryGrid } from '../../components/ui/MasonryGrid';
+import { BentoGridShowcase } from '../../components/ui/BentoGridShowcase';
 import { assetPaths } from '../../config/assets';
 import { BASE_URL } from '../../config/site';
 import { ROUTES } from '../../config/routes';
@@ -45,13 +44,7 @@ const fadeInUp = {
   }),
 };
 
-const CLIENTS: Array<{ name: string; icon: LucideIcon }> = [
-  { name: 'DAIKIN', icon: Hexagon },
-  { name: 'MITSUBISHI', icon: Triangle },
-  { name: 'HITACHI', icon: Command },
-  { name: 'Panasonic', icon: Ghost },
-  { name: 'TOSHIBA', icon: Gem },
-];
+const BRANDS = ['DAIKIN', 'MITSUBISHI', 'HITACHI', 'Panasonic', 'TOSHIBA'];
 
 const checkSigns = [
   { title: '冷暖房の効きムラ', desc: '部屋全体が均一に冷えない・暖まらない状態が続いている。' },
@@ -62,26 +55,34 @@ const checkSigns = [
   { title: '室内環境が追いつかない', desc: '厨房の排熱や人の出入りが多く、空調が能力不足になっている。' },
 ];
 
-const benefits = [
+const benefits: Array<{ title: string; desc: string; icon: LucideIcon; stat: string; statLabel: string }> = [
   {
     title: '省エネ',
     desc: '運転効率（APF）の改善により、電力負担を最適化します。削減幅は使用状況・既設機種により異なります。',
     icon: Zap,
+    stat: 'APF',
+    statLabel: '効率改善',
   },
   {
     title: '快適',
     desc: '気流制御や温度センシングの進化で、ムラの少ない快適な空間を実現します。',
     icon: Wind,
+    stat: '360°',
+    statLabel: '気流制御',
   },
   {
     title: '安心',
     desc: '故障リスクを低減し、突発停止の不安を解消。計画的な更新サイクルをつくりやすくなります。',
     icon: ShieldCheck,
+    stat: '10年',
+    statLabel: '長寿命設計',
   },
   {
     title: '法令・管理',
     desc: 'フロン排出抑制法に基づく簡易点検・定期点検・記録保存・回収の整合を、更新工事の中で整えます。',
     icon: Scale,
+    stat: '準拠',
+    statLabel: 'フロン法対応',
   },
 ];
 
@@ -90,31 +91,35 @@ const scopeItems = [
     title: '対応機種',
     desc: '天井カセット形・壁掛形・床置形・ダクト形・ビル用マルチなど、主要メーカーの業務用機器に幅広く対応します。',
     icon: Settings,
+    image: 'https://images.unsplash.com/photo-1635048424329-a9bfb146d7aa?q=80&w=1770&auto=format&fit=crop',
   },
   {
     title: '現地調査',
     desc: '冷暖房能力・配管経路・電源容量・搬入経路を確認し、現場条件に合った機器選定を行います。',
     icon: ClipboardList,
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1770&auto=format&fit=crop',
   },
   {
     title: '施工',
     desc: '営業への影響を最小化するため、夜間工事や休業日施工をご提案。短工期での入替を目指します。',
     icon: Wrench,
+    image: 'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=1770&auto=format&fit=crop',
   },
   {
     title: '撤去・処分・フロン回収',
     desc: '既設機器の撤去・廃棄処分に加え、フロン排出抑制法に準拠した冷媒回収まで一括で対応します。',
     icon: Truck,
+    image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1770&auto=format&fit=crop',
   },
 ];
 
 const flowSteps = [
-  { num: '01', title: 'ヒアリング', desc: '現状の課題やご要望を伺います。' },
-  { num: '02', title: '現地調査', desc: '設置環境・配管・電源を確認します。' },
-  { num: '03', title: '選定・見積', desc: '条件に合った機器と費用をご提案します。' },
-  { num: '04', title: '施工', desc: '営業影響を抑えた工程で施工します。' },
-  { num: '05', title: '試運転・引渡', desc: '動作確認後、操作方法をご説明します。' },
-  { num: '06', title: '運用サポート', desc: 'メンテナンスや点検のご相談を承ります。' },
+  { num: '01', title: 'ヒアリング', desc: '現状の課題やご要望を伺い、最適なご提案の土台をつくります。', icon: Phone },
+  { num: '02', title: '選定・見積り', desc: '現場条件に合った機器と費用をご提案します。', icon: ClipboardList },
+  { num: '03', title: '契約', desc: '内容にご納得いただけましたら、正式にご契約いただきます。', icon: FileCheck },
+  { num: '04', title: '現地調査', desc: '設置環境・配管・電源を現地で確認します。', icon: Settings },
+  { num: '05', title: '試運転・引渡', desc: '動作確認後、操作方法をご説明します。', icon: ShieldCheck },
+  { num: '06', title: '運用サポート', desc: 'メンテナンスや点検のご相談を承ります。', icon: Wrench },
 ];
 
 const costFactors = [
@@ -125,6 +130,39 @@ const costFactors = [
   '搬入経路の条件（階段・クレーン等）',
   '夜間・休日施工の要否',
   '撤去処分・フロン回収費用',
+];
+
+const caseStudies = [
+  {
+    title: '飲食チェーン店舗',
+    tag: '天井カセット形 3台',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1770&auto=format&fit=crop',
+  },
+  {
+    title: 'オフィスビル 5F',
+    tag: 'ビル用マルチ',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1770&auto=format&fit=crop',
+  },
+  {
+    title: '美容サロン',
+    tag: '壁掛形 2台',
+    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1770&auto=format&fit=crop',
+  },
+  {
+    title: 'クリニック',
+    tag: '天井カセット形 4台',
+    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1770&auto=format&fit=crop',
+  },
+  {
+    title: 'アパレルショップ',
+    tag: 'ダクト形',
+    image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1770&auto=format&fit=crop',
+  },
+  {
+    title: '学習塾',
+    tag: '壁掛形 6台',
+    image: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1770&auto=format&fit=crop',
+  },
 ];
 
 const faqItems = [
@@ -167,13 +205,11 @@ const sceneVisuals = [
     image:
       'https://images.unsplash.com/photo-1632833239869-a37e3a5806d2?q=80&w=1770&auto=format&fit=crop',
     title: '現地調査・診断',
-    note: '調査から撤去・フロン回収まで、入替に関わる工程をワンストップで対応します。',
   },
   {
     image:
       'https://images.unsplash.com/photo-1497215842964-222b430dc094?q=80&w=1770&auto=format&fit=crop',
     title: '機器選定・施工',
-    note: '営業への影響を最小化するため、夜間工事や休業日施工をご提案。短工期での入替を目指します。',
   },
 ];
 
@@ -187,21 +223,21 @@ const FAQItem: React.FC<{ item: (typeof faqItems)[number]; index: number }> = ({
       viewport={{ once: true }}
       custom={index}
       variants={fadeInUp}
-      className="rounded-2xl border border-black/10 bg-white/70 backdrop-blur-md"
+      className="border-b border-black/8 last:border-b-0"
     >
       <button
         onClick={() => setIsOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left md:px-7 md:py-6"
+        className="flex w-full items-center justify-between gap-4 py-6 text-left md:py-8"
       >
-        <div className="flex items-center gap-3 md:gap-4">
-          <span className="shrink-0 text-xs font-mono tracking-wider text-brand-green md:text-sm">
+        <div className="flex items-center gap-4">
+          <span className="shrink-0 text-sm font-mono tracking-wider text-brand-green">
             Q{String(index + 1).padStart(2, '0')}
           </span>
-          <span className="text-sm font-bold leading-relaxed text-gray-800 md:text-base">
+          <span className="text-base font-bold leading-relaxed text-gray-800 md:text-lg">
             {item.q}
           </span>
         </div>
-        <ChevronDown className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-5 w-5 shrink-0 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <motion.div
@@ -210,8 +246,8 @@ const FAQItem: React.FC<{ item: (typeof faqItems)[number]; index: number }> = ({
         transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
         className="overflow-hidden"
       >
-        <div className="px-5 pb-6 md:px-7 md:pb-7">
-          <p className="text-sm leading-8 text-gray-500 md:text-base">{item.a}</p>
+        <div className="pb-8">
+          <p className="text-base leading-8 text-gray-500 pl-10 md:pl-12">{item.a}</p>
         </div>
       </motion.div>
     </motion.div>
@@ -221,6 +257,17 @@ const FAQItem: React.FC<{ item: (typeof faqItems)[number]; index: number }> = ({
 const CommercialAircon: React.FC = () => {
   const routeMeta = getStaticRouteMeta(ROUTES.servicesEcoCommercialAircon);
   const canonicalUrl = toCanonicalUrl(ROUTES.servicesEcoCommercialAircon);
+
+  const [activeScopeIndex, setActiveScopeIndex] = useState(0);
+  const handleScopeSelect = useCallback((i: number) => setActiveScopeIndex(i), []);
+
+  const heroRef = React.useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const heroImgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   useLayoutEffect(() => {
     const faqJsonLd = {
@@ -273,365 +320,342 @@ const CommercialAircon: React.FC = () => {
   }, [canonicalUrl, routeMeta?.title]);
 
   return (
-    <div className="relative overflow-hidden bg-[#fbfdfd] text-black">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_8%,rgba(16,185,129,0.16),transparent_38%),radial-gradient(circle_at_90%_2%,rgba(56,189,248,0.14),transparent_36%),radial-gradient(circle_at_50%_100%,rgba(16,185,129,0.08),transparent_42%)]" />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -left-28 top-20 h-72 w-72 rounded-full bg-brand-green/15 blur-3xl"
-        animate={{ x: [0, 32, -14, 0], y: [0, 20, 6, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute right-0 top-[28rem] h-80 w-80 rounded-full bg-sky-300/20 blur-3xl"
-        animate={{ x: [0, -30, 18, 0], y: [0, -18, 14, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-      />
+    <div className="min-h-screen bg-white text-black">
 
-      <section className="relative min-h-[88vh] overflow-hidden pt-6 md:pt-10">
-        <div className="absolute inset-0">
+      {/* ═══════════════════════════════════
+          HERO — Centered, compelling copy
+      ═══════════════════════════════════ */}
+      <section ref={heroRef} className="relative min-h-screen overflow-hidden">
+        <motion.div className="absolute inset-0" style={{ y: heroImgY }}>
           <img
             src={assetPaths.services.airConditioner}
             alt=""
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full object-cover"
             width={1920}
             height={1080}
             loading="eager"
             decoding="async"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(250,252,252,0.96)_10%,rgba(250,252,252,0.78)_42%,rgba(250,252,252,0.35)_100%)]" />
-          <div
-            className="absolute inset-0"
-            style={{
-              opacity: 0.08,
-              backgroundImage:
-                "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-              backgroundSize: '128px 128px',
-            }}
-          />
-        </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-white/30 to-white" />
+        </motion.div>
 
-        <div className="relative z-10 mx-auto flex min-h-[82vh] w-full max-w-[1440px] items-center px-6 pb-10 pt-12 md:px-16 md:pt-14 lg:px-20 lg:pt-16">
-          <div className="grid w-full grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
+        <motion.div
+          className="relative z-10 flex min-h-screen flex-col items-start justify-center"
+          style={{ opacity: heroOpacity }}
+        >
+          <div className="mx-auto w-full max-w-[1400px] px-6 md:px-16 lg:px-20">
+            <nav aria-label="パンくずリスト" className="mb-12">
+              <ol className="flex flex-wrap items-center gap-2 text-xs font-mono tracking-wider text-black/40">
+                <li>
+                  <Link to={ROUTES.home} className="transition-colors hover:text-black">Home</Link>
+                </li>
+                <li><ChevronRight className="h-3.5 w-3.5" /></li>
+                <li>
+                  <Link to={ROUTES.services} className="transition-colors hover:text-black">Services</Link>
+                </li>
+                <li><ChevronRight className="h-3.5 w-3.5" /></li>
+                <li>
+                  <Link to={ROUTES.servicesEco} className="transition-colors hover:text-black">Eco Solution</Link>
+                </li>
+                <li><ChevronRight className="h-3.5 w-3.5" /></li>
+                <li className="text-black/70">Commercial Aircon</li>
+              </ol>
+            </nav>
+
             <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              custom={0}
-              variants={fadeInUp}
-              className="lg:col-span-7 lg:-translate-y-8"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <nav aria-label="パンくずリスト" className="mb-8">
-                <ol className="flex flex-wrap items-center gap-2 text-[10px] font-mono tracking-wider text-black/45 md:text-xs">
-                  <li>
-                    <Link to={ROUTES.home} className="transition-colors hover:text-black">
-                      Home
-                    </Link>
-                  </li>
-                  <li>
-                    <ChevronRight className="h-3 w-3" />
-                  </li>
-                  <li>
-                    <Link to={ROUTES.services} className="transition-colors hover:text-black">
-                      Services
-                    </Link>
-                  </li>
-                  <li>
-                    <ChevronRight className="h-3 w-3" />
-                  </li>
-                  <li>
-                    <Link
-                      to={ROUTES.servicesEco}
-                      className="transition-colors hover:text-black"
-                    >
-                      Eco Solution
-                    </Link>
-                  </li>
-                  <li>
-                    <ChevronRight className="h-3 w-3" />
-                  </li>
-                  <li className="text-black/70">Commercial Aircon</li>
-                </ol>
-              </nav>
-
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-green/30 bg-white/75 px-4 py-1.5 backdrop-blur-md">
-                <Star className="h-3.5 w-3.5 text-brand-green" />
-                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-green md:text-xs">
-                  Eco-Friendly Solution
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-green/30 bg-white/80 px-5 py-2 backdrop-blur-md">
+                <Star className="h-4 w-4 text-brand-green" />
+                <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-green">
+                  Commercial Aircon
                 </span>
               </div>
 
-              <p className="text-sm font-mono tracking-[0.3em] text-black/45">Commercial Aircon</p>
-              <h1 className="mt-2 text-5xl font-black leading-[0.95] tracking-tighter text-black md:text-7xl lg:text-8xl">
-                業務用エアコン
+              <h1 className="text-5xl font-black leading-[0.92] tracking-tighter md:text-7xl lg:text-[6.5rem]">
+                止まらない空調を、
                 <br />
-                <span className="bg-gradient-to-r from-brand-green to-brand-blue bg-clip-text text-transparent">更新</span>
+                <span className="bg-gradient-to-r from-brand-green to-emerald-400 bg-clip-text text-transparent">
+                  止まらない経営を。
+                </span>
               </h1>
 
-              <div className="mt-7 max-w-3xl text-base leading-relaxed text-black/65 md:text-lg">
-                <MaskTextReveal text="店舗・オフィスの現地調査から、機器選定・施工・フロン回収まで一括対応。目的とご予算に合わせた最適な更新プランをご提案します。" />
+              <div className="mt-8 max-w-2xl">
+                <MaskTextReveal
+                  text="現地調査から機器選定・施工・フロン回収まで一括対応。店舗やオフィスの空調を、ダウンタイムなく最新鋭へ。"
+                  className="text-lg leading-relaxed text-black/55 md:text-xl"
+                />
               </div>
 
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <MagneticButton>
+                  <Link
+                    to={ROUTES.contact}
+                    className="inline-flex touch-manipulation items-center justify-center gap-2 rounded-full bg-brand-green px-9 py-4 text-base font-bold text-white shadow-lg transition-all hover:scale-[1.02] hover:bg-brand-green/90"
+                  >
+                    現地調査を依頼
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </MagneticButton>
                 <Link
                   to={ROUTES.contact}
-                  className="inline-flex touch-manipulation items-center justify-center gap-2 rounded-full bg-brand-green px-8 py-4 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02] hover:bg-brand-green/90"
-                >
-                  現地調査を依頼
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  to={ROUTES.contact}
-                  className="inline-flex touch-manipulation items-center justify-center gap-2 rounded-full border border-black/10 bg-white/75 px-8 py-4 text-sm font-bold text-black backdrop-blur-md transition-colors hover:bg-white"
+                  className="inline-flex touch-manipulation items-center justify-center gap-2 rounded-full border border-black/10 bg-white/80 px-9 py-4 text-base font-bold text-black backdrop-blur-md transition-colors hover:bg-white"
                 >
                   <ClipboardList className="h-4 w-4 text-brand-green" />
                   概算見積を相談
                 </Link>
               </div>
             </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              custom={2}
-              variants={fadeInUp}
-              className="relative lg:col-span-5"
-            >
-              <div className="relative mx-auto h-[18rem] w-[18rem] max-w-full overflow-hidden rounded-full border border-white/70 shadow-2xl md:h-[22rem] md:w-[22rem] lg:ml-auto">
-                <img
-                  src={sceneVisuals[0].image}
-                  alt={sceneVisuals[0].title}
-                  className="h-full w-full object-cover"
-                  width={900}
-                  height={900}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.25),rgba(255,255,255,0.05))]" />
-              </div>
-
-              <div className="absolute -bottom-8 left-4 h-28 w-28 overflow-hidden rounded-full border border-white/75 shadow-xl md:h-36 md:w-36">
-                <img
-                  src={sceneVisuals[1].image}
-                  alt={sceneVisuals[1].title}
-                  className="h-full w-full object-cover"
-                  width={600}
-                  height={600}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-
-              <div className="absolute -right-2 top-10 rounded-2xl border border-black/10 bg-white/80 px-4 py-3 shadow-lg backdrop-blur-md md:right-0 md:px-5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/45">Supported Brands</p>
-                <div className="mt-2 space-y-1.5">
-                  {CLIENTS.slice(0, 3).map((client) => (
-                    <div key={client.name} className="flex items-center gap-2">
-                      <client.icon className="h-3.5 w-3.5 text-brand-green" />
-                      <span className="text-xs font-bold tracking-wide text-black/70 md:text-sm">{client.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-14 rounded-3xl border border-black/10 bg-white/70 p-6 shadow-xl backdrop-blur-md md:mt-16 md:p-7">
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div>
-                    <p className="text-lg font-black text-brand-green md:text-xl">主要</p>
-                    <p className="text-[10px] font-mono tracking-wider text-black/45 md:text-xs">メーカー対応</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-black text-brand-green md:text-xl">夜間</p>
-                    <p className="text-[10px] font-mono tracking-wider text-black/45 md:text-xs">休日施工可</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-black text-brand-green md:text-xl">回収</p>
-                    <p className="text-[10px] font-mono tracking-wider text-black/45 md:text-xs">フロン排出法準拠</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
           </div>
-        </div>
+        </motion.div>
+
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-64 bg-gradient-to-t from-white via-white/95 via-[40%] to-transparent" />
       </section>
 
-      <div className="relative z-10 mx-auto -mt-2 flex max-w-[1440px] flex-wrap gap-2 px-6 md:px-16 lg:px-20">
-        {[
-          { href: '#warning-signs', label: 'こんな症状、ありませんか？' },
-          { href: '#benefits', label: '更新で変わること' },
-          { href: '#coverage', label: '対応範囲' },
-          { href: '#process-flow', label: '導入の流れ' },
-          { href: '#faq', label: 'よくあるご質問' },
-        ].map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
-            className="rounded-full border border-black/10 bg-white/75 px-4 py-2 text-[11px] font-bold tracking-wider text-black/70 transition-colors hover:bg-brand-green hover:text-white"
-          >
-            {item.label}
-          </a>
-        ))}
-      </div>
+      {/* ═══════════════════════════════════
+          BRAND MARQUEE — Seamlessly connected
+      ═══════════════════════════════════ */}
+      <section className="relative z-10 -mt-16 overflow-hidden bg-white py-8 md:py-10">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-white to-transparent md:w-48" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-white to-transparent md:w-48" />
+        <Marquee pauseOnHover className="[--duration:30s] [--gap:3rem] md:[--gap:5rem]">
+          {BRANDS.map((brand) => (
+            <span
+              key={brand}
+              className="select-none whitespace-nowrap text-3xl font-black tracking-[0.15em] text-black/8 md:text-5xl"
+            >
+              {brand}
+            </span>
+          ))}
+        </Marquee>
+      </section>
 
-      <section id="warning-signs" className="relative z-10 scroll-mt-32 px-6 pb-24 pt-16 md:px-16 md:pb-28 md:pt-20 lg:px-20">
-        <div className="mx-auto max-w-[1440px]">
+      {/* ═══════════════════════════════════
+          BENTO GRID — Service overview
+      ═══════════════════════════════════ */}
+      <section className="bg-white px-6 pb-28 pt-16 md:px-16 md:pb-36 md:pt-24 lg:px-20">
+        <div className="mx-auto max-w-[1400px]">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             custom={0}
             variants={fadeInUp}
-            className="mb-14 md:mb-16"
+            className="mb-16 md:mb-20"
           >
-            <p className="mb-4 text-[10px] font-mono uppercase tracking-[0.3em] text-brand-green md:text-xs">Warning Signs</p>
-            <h2 className="text-3xl font-black tracking-tighter md:text-5xl lg:text-6xl">こんな症状、ありませんか？</h2>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-gray-500 md:text-lg">
+            <p className="mb-4 text-xs font-mono uppercase tracking-[0.3em] text-brand-green">Service Overview</p>
+            <h2 className="text-4xl font-black tracking-tighter md:text-6xl lg:text-7xl">ワンストップで、最適解へ。</h2>
+          </motion.div>
+
+          <BentoGridShowcase
+            integrations={
+              <div className="flex h-full flex-col justify-between rounded-2xl border border-black/5 bg-gray-50/60 p-7 md:p-8">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-green mb-3">Supported Brands</p>
+                  <p className="text-base text-gray-500 leading-relaxed">主要5メーカーの業務用エアコンに対応。最適な機器を選定します。</p>
+                </div>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {BRANDS.map((b) => (
+                    <span key={b} className="rounded-full bg-white px-4 py-1.5 text-sm font-bold text-gray-700 shadow-sm">{b}</span>
+                  ))}
+                </div>
+              </div>
+            }
+            mainFeature={
+              <div className="relative h-full min-h-[400px] overflow-hidden rounded-2xl">
+                <img
+                  src={sceneVisuals[0].image}
+                  alt="現地調査"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  width={800}
+                  height={1200}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-7 md:p-8">
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/60 mb-2">Main Service</p>
+                  <h3 className="text-2xl font-black text-white tracking-tight md:text-3xl">現地調査から<br />施工・運用まで</h3>
+                  <p className="mt-3 text-base text-white/60 leading-relaxed">入替に関わるすべての工程を、ワンストップで対応します。</p>
+                </div>
+              </div>
+            }
+            featureTags={
+              <div className="flex h-full flex-col justify-center rounded-2xl border border-black/5 bg-gray-50/60 p-7 md:p-8">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-green mb-4">Key Features</p>
+                <div className="flex flex-wrap gap-2">
+                  {['夜間施工可', 'フロン回収', '全メーカー対応', 'リース可', '短工期'].map((tag) => (
+                    <span key={tag} className="rounded-full border border-brand-green/20 bg-brand-green/5 px-4 py-2 text-sm font-bold text-brand-green">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            }
+            secondaryFeature={
+              <div className="flex h-full flex-col justify-center rounded-2xl bg-brand-green p-7 md:p-8">
+                <Wind className="h-8 w-8 text-white/80 mb-4" />
+                <h3 className="text-xl font-black text-white tracking-tight md:text-2xl">快適な空間を、<br />省エネで実現</h3>
+                <p className="mt-3 text-base text-white/60 leading-relaxed">最新の気流制御で、ムラのない温度環境を実現します。</p>
+              </div>
+            }
+            statistic={
+              <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-black/5 bg-gray-50/60 p-7 text-center md:p-8">
+                <p className="text-7xl font-black text-brand-green md:text-8xl">5</p>
+                <p className="mt-2 text-lg font-bold text-gray-800">メーカー対応</p>
+                <p className="mt-3 text-base text-gray-400 leading-relaxed">ダイキン・三菱電機・日立・パナソニック・東芝</p>
+                <div className="mt-6 h-px w-16 bg-brand-green/30" />
+                <p className="mt-6 text-5xl font-black text-brand-green md:text-6xl">24h</p>
+                <p className="mt-2 text-lg font-bold text-gray-800">夜間施工対応</p>
+                <p className="mt-3 text-base text-gray-400 leading-relaxed">営業への影響を最小限に</p>
+              </div>
+            }
+            journey={
+              <div className="relative h-full min-h-[200px] overflow-hidden rounded-2xl">
+                <img
+                  src={sceneVisuals[1].image}
+                  alt="施工完了"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  width={800}
+                  height={400}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+                <div className="relative z-10 flex h-full items-center p-7 md:p-8">
+                  <div>
+                    <Building2 className="h-6 w-6 text-white/80 mb-3" />
+                    <h3 className="text-xl font-black text-white tracking-tight md:text-2xl">導入後も安心</h3>
+                    <p className="mt-2 text-base text-white/60">定期点検・メンテナンスまでサポート</p>
+                  </div>
+                </div>
+              </div>
+            }
+          />
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════
+          WARNING SIGNS — MasonryGrid layout
+      ═══════════════════════════════════ */}
+      <section id="warning-signs" className="scroll-mt-32 bg-white px-6 pb-28 pt-8 md:px-16 md:pb-36 lg:px-20">
+        <div className="mx-auto max-w-[1400px]">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            variants={fadeInUp}
+            className="mb-16 md:mb-20"
+          >
+            <p className="mb-4 text-xs font-mono uppercase tracking-[0.3em] text-brand-green">Warning Signs</p>
+            <h2 className="text-4xl font-black tracking-tighter md:text-6xl lg:text-7xl">
+              こんな症状、<br className="md:hidden" />ありませんか？
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-gray-400">
               以下のサインが複数あてはまる場合、入替を検討するタイミングかもしれません。
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2">
-              {checkSigns.map((item, i) => (
-                <motion.div
+          <MasonryGrid columns={3} gap={5} className="hidden md:block">
+            {checkSigns.map((item, i) => {
+              const isLarge = i === 0 || i === 3;
+              return (
+                <div
                   key={item.title}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  custom={i}
-                  variants={fadeInUp}
-                  className="relative min-h-[11rem] rounded-2xl border border-black/8 bg-white/75 p-2 backdrop-blur-md"
+                  className={`group rounded-2xl border border-black/5 bg-gray-50/50 p-7 transition-colors hover:border-brand-green/20 hover:bg-brand-green/[0.03] md:p-9 ${
+                    isLarge ? 'pb-12 md:pb-16' : ''
+                  }`}
                 >
-                  <GlowingEffect spread={34} glow proximity={64} inactiveZone={0.01} disabled={false} />
-                  <div className="relative h-full rounded-xl bg-white/70 px-5 py-6 md:px-6 md:py-7">
-                    <div className="mb-3 flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-brand-green" />
-                      <h3 className="text-base font-black tracking-tight text-gray-800 md:text-lg">{item.title}</h3>
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-green/8 transition-colors group-hover:bg-brand-green/15">
+                      <AlertTriangle className="h-4.5 w-4.5 text-brand-green" />
                     </div>
-                    <p className="text-sm leading-7 text-gray-500 md:text-base md:leading-8">{item.desc}</p>
+                    <span className="text-xs font-mono tracking-wider text-black/25">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
                   </div>
-                </motion.div>
-              ))}
-            </div>
+                  <h3 className="text-xl font-bold tracking-tight text-gray-800">{item.title}</h3>
+                  <p className="mt-3 text-base leading-7 text-gray-400">{item.desc}</p>
+                </div>
+              );
+            })}
+          </MasonryGrid>
 
-            <div className="space-y-4">
-              {sceneVisuals.map((scene, index) => (
-                <motion.article
-                  key={scene.title}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  custom={index + 2}
-                  variants={fadeInUp}
-                  className="overflow-hidden rounded-2xl border border-black/10 bg-white/75 backdrop-blur-md"
-                >
-                  <img
-                    src={scene.image}
-                    alt={scene.title}
-                    className="h-44 w-full object-cover"
-                    width={960}
-                    height={540}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div className="px-5 py-5 md:px-6">
-                    <h3 className="mb-2 text-base font-black tracking-tight md:text-lg">{scene.title}</h3>
-                    <p className="text-sm leading-7 text-gray-500">{scene.note}</p>
-                  </div>
-                </motion.article>
-              ))}
-            </div>
+          <div className="space-y-3 md:hidden">
+            {checkSigns.map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={i}
+                variants={fadeInUp}
+                className="group flex items-start gap-4 rounded-xl border border-black/5 bg-gray-50/50 p-5"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-green/8">
+                  <AlertTriangle className="h-4 w-4 text-brand-green" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold tracking-tight text-gray-800">{item.title}</h3>
+                  <p className="mt-1 text-base leading-7 text-gray-400">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="relative z-10 px-6 pb-8 md:px-16 lg:px-20">
-        <div className="mx-auto max-w-[1440px] overflow-hidden rounded-[2rem] border border-black/10 bg-white/70 shadow-xl backdrop-blur-md">
-          <div className="grid grid-cols-1 lg:grid-cols-12">
-            <div className="relative min-h-[16rem] lg:col-span-5">
-              <img
-                src={sceneVisuals[1].image}
-                alt={sceneVisuals[1].title}
-                className="h-full w-full object-cover"
-                width={1600}
-                height={900}
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(250,252,252,0.86),rgba(250,252,252,0.22))]" />
-            </div>
-            <div className="p-6 lg:col-span-7 md:p-10">
-              <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-brand-green md:text-xs">Visual Focus</p>
-              <h3 className="mt-3 text-2xl font-black tracking-tight md:text-4xl">空間全体の空調品質を再設計。</h3>
-              <p className="mt-4 text-sm leading-8 text-gray-500 md:text-base">
-                調査・選定・施工・運用サポートを一連で整えることで、現場に合わせた空調更新を実現します。
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="benefits" className="relative z-10 scroll-mt-32 px-6 pb-24 pt-12 md:px-16 md:pb-28 lg:px-20">
-        <div className="mx-auto max-w-[1440px]">
+      {/* ═══════════════════════════════════
+          BENEFITS — Highlight banner + dividers
+      ═══════════════════════════════════ */}
+      <section id="benefits" className="scroll-mt-32 bg-white px-6 pb-28 md:px-16 md:pb-36 lg:px-20">
+        <div className="mx-auto max-w-[1400px]">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             custom={0}
             variants={fadeInUp}
-            className="mb-14 text-center md:mb-16"
+            className="mb-16 md:mb-20"
           >
-            <p className="mb-4 text-[10px] font-mono uppercase tracking-[0.3em] text-brand-green md:text-xs">Benefits</p>
-            <h2 className="text-3xl font-black tracking-tighter md:text-5xl lg:text-6xl">更新で変わること</h2>
+            <p className="mb-4 text-xs font-mono uppercase tracking-[0.3em] text-brand-green">Benefits</p>
+            <h2 className="text-4xl font-black tracking-tighter md:text-6xl lg:text-7xl">更新で変わること</h2>
           </motion.div>
 
-          <motion.article
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             custom={0}
             variants={fadeInUp}
-            className="relative mb-5 overflow-hidden rounded-[2rem] border border-black/10 bg-white/70 backdrop-blur-md"
+            className="relative mb-12 overflow-hidden rounded-3xl bg-gradient-to-br from-brand-green to-emerald-600 md:mb-16"
           >
-            <img
-              src={sceneVisuals[0].image}
-              alt={sceneVisuals[0].title}
-              className="absolute inset-0 h-full w-full object-cover"
-              width={1600}
-              height={900}
-              loading="lazy"
-              decoding="async"
+            <div
+              className="absolute inset-0 pointer-events-none opacity-10"
+              style={{
+                backgroundImage:
+                  "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+                backgroundSize: '128px 128px',
+              }}
             />
-            <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(250,252,252,0.95)_20%,rgba(250,252,252,0.75)_46%,rgba(250,252,252,0.45)_100%)]" />
-            <div className="relative grid grid-cols-1 gap-6 px-6 py-7 md:px-9 md:py-10 lg:grid-cols-12">
-              <div className="lg:col-span-8">
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-green/10">
-                    {React.createElement(benefits[0].icon, { className: 'h-5 w-5 text-brand-green' })}
-                  </div>
-                  <h3 className="text-2xl font-black tracking-tight text-brand-green md:text-3xl">{benefits[0].title}</h3>
-                </div>
-                <p className="max-w-2xl text-sm leading-8 text-gray-600 md:text-base">{benefits[0].desc}</p>
+            <div className="relative flex flex-col items-start gap-8 p-8 md:flex-row md:items-center md:gap-16 md:p-14">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm md:h-28 md:w-28">
+                <Zap className="h-10 w-10 text-white md:h-14 md:w-14" />
               </div>
-              <div className="lg:col-span-4 lg:flex lg:justify-end">
-                <div className="relative h-36 w-36 overflow-hidden rounded-full border border-white/80 shadow-xl md:h-44 md:w-44">
-                  <img
-                    src={sceneVisuals[1].image}
-                    alt={sceneVisuals[1].title}
-                    className="h-full w-full object-cover"
-                    width={700}
-                    height={700}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.28),rgba(255,255,255,0.08))]" />
-                </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold uppercase tracking-[0.2em] text-white/60">Top Benefit</p>
+                <h3 className="mt-2 text-3xl font-black tracking-tight text-white md:text-5xl">{benefits[0].title}</h3>
+                <p className="mt-4 max-w-2xl text-lg leading-8 text-white/70">{benefits[0].desc}</p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-5xl font-black text-white md:text-7xl">{benefits[0].stat}</p>
+                <p className="text-base font-bold text-white/50">{benefits[0].statLabel}</p>
               </div>
             </div>
-          </motion.article>
+          </motion.div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+          <div className="grid grid-cols-1 gap-0 divide-y divide-black/6 md:grid-cols-3 md:gap-0 md:divide-x md:divide-y-0">
             {benefits.slice(1).map((item, i) => (
               <motion.div
                 key={item.title}
@@ -640,17 +664,272 @@ const CommercialAircon: React.FC = () => {
                 viewport={{ once: true }}
                 custom={i + 1}
                 variants={fadeInUp}
-                className="relative rounded-2xl border border-black/10 bg-white/70 p-2 backdrop-blur-md"
+                className="py-8 md:px-8 md:py-0 md:first:pl-0 md:last:pr-0"
               >
-                <GlowingEffect spread={36} glow proximity={62} inactiveZone={0.01} disabled={false} />
-                <div className="relative h-full rounded-xl bg-white/85 px-5 py-7 md:px-6 md:py-8">
-                  <div className="mb-3 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-green/10">
-                      <item.icon className="h-5 w-5 text-brand-green" />
-                    </div>
-                    <h3 className="text-lg font-black tracking-tight text-brand-green md:text-xl">{item.title}</h3>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-green/8">
+                    <item.icon className="h-6 w-6 text-brand-green" />
                   </div>
-                  <p className="text-sm leading-8 text-gray-500">{item.desc}</p>
+                  <div>
+                    <p className="text-2xl font-black text-brand-green">{item.stat}</p>
+                    <p className="text-xs font-mono tracking-wider text-gray-400">{item.statLabel}</p>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold tracking-tight text-gray-800">{item.title}</h3>
+                <p className="mt-2 text-base leading-7 text-gray-400">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════
+          VISUAL FOCUS — Full-bleed, taller
+      ═══════════════════════════════════ */}
+      <section className="relative overflow-hidden">
+        <div className="pointer-events-none absolute top-0 left-0 right-0 z-10 h-48 bg-gradient-to-b from-white via-white/90 via-[35%] to-transparent" />
+        <div className="relative h-[65vh] md:h-[80vh]">
+          <img
+            src={sceneVisuals[1].image}
+            alt={sceneVisuals[1].title}
+            className="h-full w-full object-cover"
+            width={1920}
+            height={1080}
+            loading="lazy"
+            decoding="async"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+          <div className="absolute inset-0 flex items-center">
+            <div className="mx-auto w-full max-w-[1400px] px-6 md:px-16 lg:px-20">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={0}
+                variants={fadeInUp}
+                className="max-w-2xl"
+              >
+                <p className="text-xs font-mono uppercase tracking-[0.3em] text-white/50">Visual Focus</p>
+                <h3 className="mt-4 text-4xl font-black tracking-tight text-white md:text-6xl lg:text-7xl leading-[0.95]">
+                  空間全体の<br />空調品質を<br />再設計。
+                </h3>
+                <p className="mt-6 max-w-xl text-lg leading-8 text-white/55">
+                  調査・選定・施工・運用サポートを一連で整えることで、現場に合わせた空調更新を実現します。
+                </p>
+                <div className="mt-8">
+                  <Link
+                    to={ROUTES.contact}
+                    className="inline-flex items-center gap-2 text-base font-bold tracking-[0.1em] uppercase text-white/80 transition-colors hover:text-white"
+                  >
+                    お問い合わせ <ArrowUpRight className="h-5 w-5" />
+                  </Link>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-48 bg-gradient-to-t from-white via-white/90 via-[35%] to-transparent" />
+      </section>
+
+      {/* ═══════════════════════════════════
+          COVERAGE — Interactive image gallery
+      ═══════════════════════════════════ */}
+      <section id="coverage" className="scroll-mt-32 bg-white px-6 py-24 md:px-16 md:py-36 lg:px-20">
+        <div className="mx-auto max-w-[1400px]">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            variants={fadeInUp}
+            className="mb-16 md:mb-20"
+          >
+            <p className="mb-4 text-xs font-mono uppercase tracking-[0.3em] text-brand-green">Coverage</p>
+            <h2 className="text-4xl font-black tracking-tighter md:text-6xl lg:text-7xl">対応範囲</h2>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-gray-400">
+              調査から撤去・フロン回収まで、入替に関わる工程をワンストップで対応します。
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={0}
+              variants={fadeInUp}
+              className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-gray-100 lg:aspect-auto lg:min-h-[520px]"
+            >
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeScopeIndex}
+                  src={scopeItems[activeScopeIndex].image}
+                  alt={scopeItems[activeScopeIndex].title}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  width={960}
+                  height={720}
+                  loading="lazy"
+                  decoding="async"
+                  initial={{ opacity: 0, scale: 1.08 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                />
+              </AnimatePresence>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              <div className="absolute bottom-7 left-7 right-7 z-10">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={activeScopeIndex}
+                    className="text-xl font-bold text-white md:text-2xl"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.35 }}
+                  >
+                    {scopeItems[activeScopeIndex].title}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+              <div className="absolute bottom-7 right-7 z-10 flex gap-1.5">
+                {scopeItems.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleScopeSelect(i)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      i === activeScopeIndex ? 'w-7 bg-white' : 'w-2 bg-white/40 hover:bg-white/60'
+                    }`}
+                    aria-label={`${scopeItems[i].title}を表示`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
+            <div className="space-y-0">
+              {scopeItems.map((item, i) => (
+                <motion.button
+                  key={item.title}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  custom={i}
+                  variants={fadeInUp}
+                  onClick={() => handleScopeSelect(i)}
+                  className={`group flex w-full items-start gap-5 border-b border-black/6 py-7 text-left transition-all md:gap-6 md:py-8 ${
+                    activeScopeIndex === i
+                      ? 'bg-brand-green/[0.03]'
+                      : 'hover:bg-gray-50/60'
+                  }`}
+                >
+                  <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl transition-colors md:h-16 md:w-16 ${
+                    activeScopeIndex === i
+                      ? 'bg-brand-green text-white'
+                      : 'bg-brand-green/8 text-brand-green group-hover:bg-brand-green/15'
+                  }`}>
+                    <item.icon className="h-6 w-6 md:h-7 md:w-7" />
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <div className="flex items-center gap-3">
+                      <h3 className={`text-lg font-bold tracking-tight md:text-xl ${
+                        activeScopeIndex === i ? 'text-brand-green' : 'text-gray-800'
+                      }`}>
+                        {item.title}
+                      </h3>
+                      <motion.div
+                        animate={{ x: activeScopeIndex === i ? 4 : 0 }}
+                        className={`transition-opacity ${activeScopeIndex === i ? 'opacity-100' : 'opacity-0'}`}
+                      >
+                        <ArrowRight className="h-4 w-4 text-brand-green" />
+                      </motion.div>
+                    </div>
+                    <p className="mt-2 text-base leading-7 text-gray-400">{item.desc}</p>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════
+          CASE STUDIES — MasonryGrid
+      ═══════════════════════════════════ */}
+      <section className="bg-white px-6 pb-28 md:px-16 md:pb-36 lg:px-20">
+        <div className="mx-auto max-w-[1400px]">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            variants={fadeInUp}
+            className="mb-16 md:mb-20"
+          >
+            <p className="mb-4 text-xs font-mono uppercase tracking-[0.3em] text-brand-green">Case Studies</p>
+            <h2 className="text-4xl font-black tracking-tighter md:text-6xl lg:text-7xl">施工事例</h2>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-gray-400">
+              さまざまな業種・規模の空調更新を手がけています。
+            </p>
+          </motion.div>
+
+          <MasonryGrid columns={3} gap={5} className="hidden md:block">
+            {caseStudies.map((item, i) => {
+              const isLarge = i === 1 || i === 4;
+              return (
+                <div
+                  key={item.title}
+                  className="group relative overflow-hidden rounded-2xl"
+                >
+                  <div className={`relative w-full overflow-hidden ${isLarge ? 'h-80' : 'h-56'}`}>
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      width={600}
+                      height={400}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+                      <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm mb-2">
+                        {item.tag}
+                      </span>
+                      <h3 className="text-lg font-bold text-white md:text-xl">{item.title}</h3>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </MasonryGrid>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:hidden">
+            {caseStudies.map((item) => (
+              <motion.div
+                key={item.title}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={0}
+                variants={fadeInUp}
+                className="group relative overflow-hidden rounded-2xl"
+              >
+                <div className="relative h-48 w-full overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="h-full w-full object-cover"
+                    width={400}
+                    height={300}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <span className="inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm mb-1.5">
+                      {item.tag}
+                    </span>
+                    <h3 className="text-base font-bold text-white">{item.title}</h3>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -658,163 +937,155 @@ const CommercialAircon: React.FC = () => {
         </div>
       </section>
 
-      <section id="coverage" className="relative z-10 scroll-mt-32 px-6 pb-24 md:px-16 md:pb-28 lg:px-20">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="pointer-events-none absolute right-0 top-10 hidden h-[24rem] w-[24rem] overflow-hidden rounded-full border border-white/80 opacity-45 blur-[1px] md:block">
-            <img
-              src={sceneVisuals[0].image}
-              alt=""
-              className="h-full w-full object-cover"
-              width={900}
-              height={900}
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
+      {/* ═══════════════════════════════════
+          PROCESS FLOW — Cards with numbered circles
+      ═══════════════════════════════════ */}
+      <section id="process-flow" className="scroll-mt-32 bg-white px-6 py-24 md:px-16 md:py-36 lg:px-20">
+        <div className="mx-auto max-w-[1400px]">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             custom={0}
             variants={fadeInUp}
-            className="mb-14 md:mb-16"
+            className="mb-16 md:mb-20"
           >
-            <p className="mb-4 text-[10px] font-mono uppercase tracking-[0.3em] text-brand-green md:text-xs">Coverage</p>
-            <h2 className="text-3xl font-black tracking-tighter md:text-5xl lg:text-6xl">対応範囲</h2>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-gray-500 md:text-lg">
-              調査から撤去・フロン回収まで、入替に関わる工程をワンストップで対応します。
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
-            {scopeItems.map((item, i) => (
-              <motion.article
-                key={item.title}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-                variants={fadeInUp}
-                className="group rounded-2xl border border-black/10 bg-white/70 px-6 py-8 backdrop-blur-md transition-colors hover:bg-white md:px-8 md:py-10"
-              >
-                <div className="mb-3 flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-green/10 transition-colors group-hover:bg-brand-green/20">
-                    <item.icon className="h-6 w-6 text-brand-green" />
-                  </div>
-                  <h3 className="text-lg font-bold tracking-tight text-gray-800 md:text-xl">{item.title}</h3>
-                </div>
-                <p className="text-sm leading-8 text-gray-500 md:text-base">{item.desc}</p>
-              </motion.article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="process-flow" className="relative z-10 scroll-mt-32 px-6 pb-24 md:px-16 md:pb-28 lg:px-20">
-        <div className="mx-auto max-w-[1440px]">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            custom={0}
-            variants={fadeInUp}
-            className="mb-14 text-center md:mb-16"
-          >
-            <p className="mb-4 text-[10px] font-mono uppercase tracking-[0.3em] text-brand-green md:text-xs">Process Flow</p>
-            <h2 className="text-3xl font-black tracking-tighter md:text-5xl lg:text-6xl">導入の流れ</h2>
+            <p className="mb-4 text-xs font-mono uppercase tracking-[0.3em] text-brand-green">Process Flow</p>
+            <h2 className="text-4xl font-black tracking-tighter md:text-6xl lg:text-7xl">導入の流れ</h2>
           </motion.div>
 
           <div className="relative">
-            <div className="pointer-events-none absolute left-6 right-6 top-10 hidden h-px bg-gradient-to-r from-transparent via-brand-green/35 to-transparent lg:block" />
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {flowSteps.map((step, i) => (
-              <motion.article
-                key={step.num}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-                variants={fadeInUp}
-                className="rounded-2xl border border-black/10 bg-white/70 px-6 py-7 backdrop-blur-md"
-              >
-                <div className="mb-4 flex items-center gap-3">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-green/30 bg-brand-green/10 text-sm font-black text-brand-green">
-                    {step.num}
-                  </span>
-                  <h3 className="text-lg font-bold tracking-tight md:text-xl">{step.title}</h3>
-                </div>
-                <p className="text-sm leading-7 text-gray-500 md:text-base">{step.desc}</p>
-              </motion.article>
-            ))}
+            <div className="pointer-events-none absolute left-0 right-0 top-[3.5rem] hidden h-px bg-gradient-to-r from-transparent via-brand-green/25 to-transparent md:block" />
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {flowSteps.map((step, i) => (
+                <motion.div
+                  key={step.num}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  custom={i}
+                  variants={fadeInUp}
+                  className="group relative"
+                >
+                  <div className="relative z-10 mb-6 flex items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-green text-white shadow-lg shadow-brand-green/20 transition-transform group-hover:scale-110">
+                      <span className="text-sm font-black">{step.num}</span>
+                    </div>
+                    {i < flowSteps.length - 1 && (
+                      <div className="hidden h-px flex-1 bg-gradient-to-r from-brand-green/20 to-transparent sm:block lg:hidden" />
+                    )}
+                  </div>
+
+                  <div className="rounded-2xl border border-black/5 bg-gray-50/40 p-7 transition-all group-hover:border-brand-green/15 group-hover:bg-brand-green/[0.02] group-hover:shadow-lg group-hover:shadow-brand-green/5 md:p-8">
+                    <div className="mb-4 flex items-center gap-3">
+                      <step.icon className="h-5 w-5 text-brand-green" />
+                      <h3 className="text-xl font-bold tracking-tight md:text-2xl">{step.title}</h3>
+                    </div>
+                    <p className="text-base leading-7 text-gray-400">{step.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="relative z-10 px-6 pb-24 md:px-16 md:pb-28 lg:px-20">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
-          <motion.article
+      {/* ═══════════════════════════════════
+          PRICING — Matched height split
+      ═══════════════════════════════════ */}
+      <section className="bg-white px-6 py-24 md:px-16 md:py-36 lg:px-20">
+        <div className="mx-auto max-w-[1400px]">
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             custom={0}
             variants={fadeInUp}
-            className="rounded-2xl border border-black/10 bg-white/70 px-6 py-8 backdrop-blur-md md:px-8 md:py-10"
+            className="mb-16 md:mb-20"
           >
-            <p className="mb-4 text-[10px] font-mono uppercase tracking-[0.3em] text-brand-green md:text-xs">Pricing</p>
-            <h2 className="mb-5 text-3xl font-black tracking-tighter md:text-5xl">費用の考え方</h2>
-            <p className="mb-6 text-sm leading-8 text-gray-500 md:text-base">
-              業務用エアコンの入替費用は、以下の要因により変動します。現地調査のうえ、条件を確認してからお見積りをご提示します。
-            </p>
-            <ul className="space-y-2">
-              {costFactors.map((factor, i) => (
-                <li key={factor} className="flex items-start gap-2 text-sm leading-7 text-gray-600 md:text-base">
-                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-green" />
-                  <span>
-                    {i + 1}. {factor}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </motion.article>
+            <p className="mb-4 text-xs font-mono uppercase tracking-[0.3em] text-brand-green">Pricing</p>
+            <h2 className="text-4xl font-black tracking-tighter md:text-6xl lg:text-7xl">費用の考え方</h2>
+          </motion.div>
 
-          <motion.article
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            custom={1}
-            variants={fadeInUp}
-            className="overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur-md"
-          >
-            <div className="relative h-52 w-full overflow-hidden md:h-56">
-              <img
-                src={assetPaths.services.airConditioner}
-                alt="業務用エアコン更新のイメージ"
-                className="h-full w-full object-cover"
-                width={960}
-                height={540}
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/15 to-transparent" />
-            </div>
-            <div className="px-6 py-8 md:px-8 md:py-10">
-              <div className="mb-4 flex items-center gap-2">
-                <Phone className="h-5 w-5 text-brand-green" />
-                <h3 className="text-lg font-bold tracking-tight md:text-xl">リース・割賦もご案内可能</h3>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={0}
+              variants={fadeInUp}
+              className="flex flex-col rounded-3xl border border-black/5 bg-gray-50/50 p-8 md:p-10"
+            >
+              <p className="mb-2 text-sm font-bold uppercase tracking-[0.15em] text-brand-green">Cost Factors</p>
+              <h3 className="mb-6 text-2xl font-black tracking-tight md:text-3xl">入替費用の変動要因</h3>
+              <p className="mb-8 text-base leading-7 text-gray-400">
+                業務用エアコンの入替費用は、以下の要因により変動します。現地調査のうえ、条件を確認してからお見積りをご提示します。
+              </p>
+              <div className="flex-1 space-y-3">
+                {costFactors.map((factor, i) => (
+                  <div key={factor} className="flex items-center gap-4 rounded-xl bg-white px-5 py-3.5 shadow-sm">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-green/10 text-sm font-bold text-brand-green">
+                      {i + 1}
+                    </span>
+                    <span className="text-base text-gray-600">{factor}</span>
+                  </div>
+                ))}
               </div>
-              <p className="mb-4 text-sm leading-8 text-gray-500 md:text-base">
-                初期費用を抑えたい場合は、リースや割賦払いの選択肢もございます。月々の負担と導入効果を比較しながら、最適なお支払い方法をご提案します。
-              </p>
-              <p className="text-xs leading-6 text-gray-400">
-                ※ リース・割賦の可否は審査によります。詳細はお問い合わせください。
-              </p>
-            </div>
-          </motion.article>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={1}
+              variants={fadeInUp}
+              className="flex flex-col overflow-hidden rounded-3xl border border-black/5"
+            >
+              <div className="relative h-56 w-full overflow-hidden md:h-64 lg:h-72">
+                <img
+                  src={assetPaths.services.airConditioner}
+                  alt="業務用エアコン更新"
+                  className="h-full w-full object-cover"
+                  width={960}
+                  height={540}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
+              </div>
+              <div className="flex flex-1 flex-col justify-center p-8 md:p-10">
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-green/10">
+                    <Phone className="h-6 w-6 text-brand-green" />
+                  </div>
+                  <h3 className="text-xl font-bold tracking-tight md:text-2xl">リース・割賦もご案内可能</h3>
+                </div>
+                <p className="text-base leading-8 text-gray-500">
+                  初期費用を抑えたい場合は、リースや割賦払いの選択肢もございます。月々の負担と導入効果を比較しながら、最適なお支払い方法をご提案します。
+                </p>
+                <p className="mt-4 text-sm leading-6 text-gray-400">
+                  ※ リース・割賦の可否は審査によります。詳細はお問い合わせください。
+                </p>
+                <div className="mt-8">
+                  <Link
+                    to={ROUTES.contact}
+                    className="inline-flex items-center gap-2 rounded-full bg-brand-green/8 px-6 py-3 text-base font-bold text-brand-green transition-colors hover:bg-brand-green/15"
+                  >
+                    お問い合わせへ <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
-      <section id="faq" className="relative z-10 scroll-mt-32 px-6 pb-24 md:px-16 md:pb-28 lg:px-20">
-        <div className="mx-auto max-w-[980px]">
+
+      {/* ═══════════════════════════════════
+          FAQ — Clean accordion
+      ═══════════════════════════════════ */}
+      <section id="faq" className="scroll-mt-32 bg-white px-6 pb-32 pt-8 md:px-16 md:pb-40 lg:px-20">
+        <div className="mx-auto max-w-[960px]">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -823,11 +1094,11 @@ const CommercialAircon: React.FC = () => {
             variants={fadeInUp}
             className="mb-14 text-center md:mb-16"
           >
-            <p className="mb-4 text-[10px] font-mono uppercase tracking-[0.3em] text-brand-green md:text-xs">FAQ</p>
-            <h2 className="text-3xl font-black tracking-tighter md:text-5xl lg:text-6xl">よくあるご質問</h2>
+            <p className="mb-4 text-xs font-mono uppercase tracking-[0.3em] text-brand-green">FAQ</p>
+            <h2 className="text-4xl font-black tracking-tighter md:text-6xl lg:text-7xl">よくあるご質問</h2>
           </motion.div>
 
-          <div className="space-y-3">
+          <div>
             {faqItems.map((item, i) => (
               <FAQItem key={item.q} item={item} index={i} />
             ))}
@@ -835,43 +1106,46 @@ const CommercialAircon: React.FC = () => {
         </div>
       </section>
 
-      <section className="relative overflow-hidden px-6 pb-24 pt-2 md:px-16 md:pb-28 lg:px-20">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          custom={0}
-          variants={fadeInUp}
-          className="relative mx-auto max-w-[1240px] overflow-hidden rounded-[2.5rem] border border-black/10 bg-white/75 text-center shadow-xl backdrop-blur-md"
-        >
-          <img
-            src={sceneVisuals[1].image}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            width={1920}
-            height={1080}
-            loading="lazy"
-            decoding="async"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(125deg,rgba(250,252,252,0.94)_14%,rgba(250,252,252,0.86)_52%,rgba(250,252,252,0.72)_100%)]" />
+      {/* ═══════════════════════════════════
+          CTA — Ultra-smooth gradient bridge
+      ═══════════════════════════════════ */}
+      <section className="relative overflow-hidden">
+        <div
+          className="h-48 md:h-64"
+          style={{
+            background: 'linear-gradient(to bottom, rgb(255,255,255) 0%, rgba(255,255,255,0.97) 15%, rgba(0,144,59,0.04) 35%, rgba(0,144,59,0.12) 55%, rgba(0,144,59,0.35) 75%, rgba(0,144,59,0.7) 90%, rgb(0,144,59) 100%)',
+          }}
+        />
+
+        <div className="relative bg-brand-green px-6 pb-28 pt-16 md:px-16 md:pb-40 md:pt-24 lg:px-20">
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 pointer-events-none opacity-10"
             style={{
-              opacity: 0.08,
               backgroundImage:
                 "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
               backgroundSize: '128px 128px',
             }}
           />
 
-          <div className="relative z-10 py-16 md:py-20">
-            <p className="mb-4 text-[10px] font-mono uppercase tracking-[0.3em] text-brand-green/80 md:text-xs">Get Started</p>
-            <h2 className="mb-6 text-4xl font-black tracking-tighter text-black md:text-6xl lg:text-7xl">
-              まずは現地状況の
-              <br className="md:hidden" />
-              確認から。
+          <div className="absolute -bottom-8 right-0 pointer-events-none select-none md:-bottom-12">
+            <span className="text-[8rem] font-black text-white/[0.06] tracking-tighter leading-none md:text-[16rem]">
+              HVAC
+            </span>
+          </div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            variants={fadeInUp}
+            className="relative z-10 mx-auto max-w-[1000px] text-center"
+          >
+            <p className="mb-6 text-xs font-mono uppercase tracking-[0.3em] text-white/50">Get Started</p>
+            <h2 className="mb-6 text-4xl font-black tracking-tighter text-white md:text-6xl lg:text-7xl">
+              まずは現地状況の<br className="md:hidden" />確認から。
             </h2>
-            <p className="mx-auto mb-10 max-w-3xl text-base leading-8 text-gray-600 md:text-lg">
+            <p className="mx-auto mb-12 max-w-2xl text-lg leading-8 text-white/60">
               目的とご予算に合わせて、最適な更新プランをご提案します。<br />
               現地調査・概算見積のご相談はお気軽にどうぞ。
             </p>
@@ -879,14 +1153,14 @@ const CommercialAircon: React.FC = () => {
             <MagneticButton>
               <Link
                 to={ROUTES.contact}
-                className="inline-flex touch-manipulation items-center justify-center rounded-full bg-brand-green px-10 py-5 text-base font-bold text-white shadow-xl transition-transform hover:scale-105 hover:bg-brand-green/90 md:px-14 md:py-6 md:text-lg"
+                className="inline-flex touch-manipulation items-center justify-center rounded-full bg-white px-12 py-5 text-lg font-bold text-brand-green shadow-xl transition-transform hover:scale-105 md:px-16 md:py-6"
               >
                 お問い合わせへ
                 <ArrowUpRight className="ml-2 h-5 w-5" />
               </Link>
             </MagneticButton>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </section>
     </div>
   );
