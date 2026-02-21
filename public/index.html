@@ -2,9 +2,8 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon_io/favicon.ico" />
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon_io/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon_io/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon_io/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/favicon_io/apple-icon-180x180.png" />
@@ -14,17 +13,17 @@
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta
       name="description"
-      content="PeaceBiz - INNOVATE THE FUTURE"
+      content="業務用空調、デジタルサイネージ「Prime Sign」、ICT整備まで。株式会社ピース・ビズは店舗・オフィスの環境を設計し、導入から運用まで一貫して支援します。"
     />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Peace Biz" />
-    <meta property="og:title" content="Peace Biz｜未来を創り、笑顔を繋ぐ。" />
-    <meta property="og:description" content="PeaceBiz - INNOVATE THE FUTURE" />
+    <meta property="og:title" content="株式会社ピース・ビズ｜店舗・オフィスの空間を設計する" />
+    <meta property="og:description" content="業務用空調、デジタルサイネージ「Prime Sign」、ICT整備まで。株式会社ピース・ビズは店舗・オフィスの環境を設計し、導入から運用まで一貫して支援します。" />
     <meta property="og:url" content="https://www.peace-biz.com/" />
     <meta property="og:image" content="https://www.peace-biz.com/assets/images/brand/logo.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Peace Biz｜未来を創り、笑顔を繋ぐ。" />
-    <meta name="twitter:description" content="PeaceBiz - INNOVATE THE FUTURE" />
+    <meta name="twitter:title" content="株式会社ピース・ビズ｜店舗・オフィスの空間を設計する" />
+    <meta name="twitter:description" content="業務用空調、デジタルサイネージ「Prime Sign」、ICT整備まで。株式会社ピース・ビズは店舗・オフィスの環境を設計し、導入から運用まで一貫して支援します。" />
     <meta name="twitter:image" content="https://www.peace-biz.com/assets/images/brand/logo.png" />
     <link rel="canonical" href="https://www.peace-biz.com/" />
     <!--
@@ -35,10 +34,62 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Peace Biz Inc.",
-        "url": "https://www.peace-biz.com/",
-        "logo": "https://www.peace-biz.com/assets/images/brand/logo.png"
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.peace-biz.com/#organization",
+            "name": "株式会社ピース・ビズ",
+            "alternateName": "Peace Biz Inc.",
+            "url": "https://www.peace-biz.com/",
+            "logo": "https://www.peace-biz.com/assets/images/brand/logo.png",
+            "sameAs": [
+              "https://www.youtube.com/@peacebiz"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.peace-biz.com/#website",
+            "name": "Peace Biz",
+            "alternateName": "株式会社ピース・ビズ",
+            "url": "https://www.peace-biz.com/"
+          },
+          {
+            "@type": "Service",
+            "@id": "https://www.peace-biz.com/#service-prime-sign",
+            "name": "Prime Sign",
+            "serviceType": "Digital Signage Solution",
+            "provider": {
+              "@id": "https://www.peace-biz.com/#organization"
+            },
+            "areaServed": "JP",
+            "url": "https://www.peace-biz.com/services/it-solution",
+            "description": "デジタルサイネージ Prime Sign の企画・導入・運用支援。"
+          },
+          {
+            "@type": "Service",
+            "@id": "https://www.peace-biz.com/#service-aircon",
+            "name": "業務用空調ソリューション",
+            "serviceType": "Commercial Air Conditioning Solution",
+            "provider": {
+              "@id": "https://www.peace-biz.com/#organization"
+            },
+            "areaServed": "JP",
+            "url": "https://www.peace-biz.com/services/eco-solution",
+            "description": "業務用空調・省エネ設備の設計、導入、保守運用支援。"
+          },
+          {
+            "@type": "Service",
+            "@id": "https://www.peace-biz.com/#service-ict",
+            "name": "ICT整備ソリューション",
+            "serviceType": "ICT Infrastructure Solution",
+            "provider": {
+              "@id": "https://www.peace-biz.com/#organization"
+            },
+            "areaServed": "JP",
+            "url": "https://www.peace-biz.com/services/office-solution",
+            "description": "ネットワーク回線・モバイル端末・オフィスICT環境の整備支援。"
+          }
+        ]
       }
     </script>
     <!--
@@ -56,7 +107,7 @@
     <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     <link rel="preload" href="%PUBLIC_URL%/assets/images/brand/logo.png" as="image">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <title>Peace Biz｜未来を創り、笑顔を繋ぐ。</title>
+    <title>株式会社ピース・ビズ｜店舗・オフィスの空間を設計する</title>
     <!-- Start Single Page Apps for GitHub Pages -->
     <script type="text/javascript">
       (function(l) {

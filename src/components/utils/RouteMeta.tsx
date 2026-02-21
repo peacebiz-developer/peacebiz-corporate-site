@@ -1,7 +1,7 @@
 import { type FC, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { applySeoMeta } from '../../utils/seo';
-import { BASE_URL, SITE_NAME } from '../../config/site';
+import { BASE_URL } from '../../config/site';
 import routeMetaJson from '../../data/content/static-route-meta.json';
 
 type RouteMetaConfig = {
@@ -14,8 +14,9 @@ type RouteMetaConfig = {
 };
 
 const DEFAULT_META: RouteMetaConfig = {
-  title: `${SITE_NAME}｜未来を創り、笑顔を繋ぐ。`,
-  description: 'Peace Biz - INNOVATE THE FUTURE',
+  title: '株式会社ピース・ビズ｜店舗・オフィスの空間を設計する',
+  description:
+    '業務用空調、デジタルサイネージ「Prime Sign」、ICT整備まで。株式会社ピース・ビズは店舗・オフィスの環境を設計し、導入から運用まで一貫して支援します。',
   canonicalPath: '/',
 };
 
