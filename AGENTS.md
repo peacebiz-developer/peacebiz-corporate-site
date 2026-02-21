@@ -10,9 +10,11 @@
 - Deploy: GitHub Actions (`.github/workflows/deploy-github-pages.yml`) で GitHub Pages へデプロイ
 - Custom Domain: `CNAME` は `www.peace-biz.com`、`package.json` の `homepage` は `https://www.peace-biz.com`
 - Build pipeline:
-  - `npm run build` = `scripts/generate-ai-context.js` -> `scripts/generate-sitemap.js` -> `react-scripts build` -> `scripts/generate-static-routes.js` -> `scripts/generate-legacy-asset-aliases.js`
+  - `npm run build` = `scripts/generate-ai-context.js` -> `scripts/generate-sitemap.js` -> `scripts/verify-seo-ai-consistency.js` -> `react-scripts build` -> `scripts/generate-static-routes.js` -> `scripts/generate-legacy-asset-aliases.js`
   - `postbuild` = `scripts/run-react-snap.js`（CI時は `--no-sandbox` 等を付与）
 - Dynamic route source: `src/data/content/news.json`, `src/data/content/works.json`（`scripts/route-manifest.js`）
+- Static route/meta source: `src/data/content/static-route-meta.json`（`src/components/utils/RouteMeta.tsx`, `scripts/route-manifest.js`）
+- CI guardrail: build後に `public/sitemap.xml` / `public/llms.txt` / `public/ai-context.json` の未コミット差分があるとデプロイを停止
 - Main asset locations:
   - `public/`（favicon・`robots.txt`・`sitemap.xml`・`404.html`・AI参照ファイル）
   - `public/assets/images/brand`, `public/assets/images/about`, `public/assets/images/services`, `public/assets/images/top`
@@ -32,6 +34,7 @@
 - Dev: `npm start`
 - Build: `npm run build`
 - AI Context Sync: `npm run sync:ai-context`
+- SEO/AI Verify: `npm run verify:seo`
 - Test: `npm test`
 - Lint: `TODO(要確認) npm script 未定義`
 - Format: `TODO(要確認) npm script 未定義`
@@ -67,6 +70,7 @@
 ## SEO & Routing Safety
 - ルーティング変更時は次をセットで確認する:
   - `src/App.tsx`（Route定義）
+  - `src/data/content/static-route-meta.json`（静的ページ canonical / robots / sitemap/prerender 対象）
   - `src/components/utils/RouteMeta.tsx`（静的ページメタ）
   - `src/pages/NewsDetail.tsx` / `src/pages/WorkDetail.tsx`（詳細ページメタ）
   - `scripts/route-manifest.js`（プリレンダー/サイトマップ対象）

@@ -1,0 +1,115 @@
+{
+  "/": {
+    "title": "Peace Biz｜未来を創り、笑顔を繋ぐ。",
+    "description": "Peace Biz - INNOVATE THE FUTURE",
+    "canonicalPath": "/",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/about": {
+    "title": "会社情報｜Peace Biz",
+    "description": "株式会社ピース・ビズの会社情報・理念・拠点情報をご紹介します。",
+    "canonicalPath": "/about",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/company": {
+    "title": "会社情報｜Peace Biz",
+    "description": "株式会社ピース・ビズの会社情報・理念・拠点情報をご紹介します。",
+    "canonicalPath": "/about",
+    "includeInPrerender": true,
+    "includeInSitemap": false
+  },
+  "/services": {
+    "title": "サービス一覧｜Peace Biz",
+    "description": "IT・ECO・OFFICEの3領域から、事業空間に最適なソリューションを提供します。",
+    "canonicalPath": "/services",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/services/it-solution": {
+    "title": "IT Solution｜Peace Biz",
+    "description": "Prime Sign、LEDサイネージ、動画制作などITソリューションをご紹介します。",
+    "canonicalPath": "/services/it-solution",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/services/eco-solution": {
+    "title": "Eco Solution｜Peace Biz",
+    "description": "業務用空調・厨房機器・太陽光発電・蓄電池・新電力などECOソリューションをご紹介します。",
+    "canonicalPath": "/services/eco-solution",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/services/office-solution": {
+    "title": "Office Solution｜Peace Biz",
+    "description": "オフィスサプライ・ネット回線・モバイル端末などOfficeソリューションをご紹介します。",
+    "canonicalPath": "/services/office-solution",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/works": {
+    "title": "事例｜Peace Biz",
+    "description": "株式会社ピース・ビズの導入事例をご紹介します。",
+    "canonicalPath": "/works",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/work": {
+    "title": "事例｜Peace Biz",
+    "description": "株式会社ピース・ビズの導入事例をご紹介します。",
+    "canonicalPath": "/works",
+    "includeInPrerender": true,
+    "includeInSitemap": false
+  },
+  "/news": {
+    "title": "ニュース｜Peace Biz",
+    "description": "株式会社ピース・ビズからのお知らせ・トピックスをご案内します。",
+    "canonicalPath": "/news",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/contact": {
+    "title": "お問い合わせ｜Peace Biz",
+    "description": "サービス導入や採用に関するお問い合わせはこちらからご連絡ください。",
+    "canonicalPath": "/contact",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/recruit": {
+    "title": "採用情報｜Peace Biz",
+    "description": "株式会社ピース・ビズの採用情報ページです。募集要項や働き方をご案内します。",
+    "canonicalPath": "/recruit",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/privacy": {
+    "title": "プライバシーポリシー｜Peace Biz",
+    "description": "株式会社ピース・ビズの個人情報保護方針です。",
+    "canonicalPath": "/privacy",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/sitepolicy": {
+    "title": "サイトポリシー｜Peace Biz",
+    "description": "株式会社ピース・ビズのサイト利用に関するポリシーです。",
+    "canonicalPath": "/sitepolicy",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/terms": {
+    "title": "利用規約｜Peace Biz",
+    "description": "株式会社ピース・ビズのサイト利用規約です。",
+    "canonicalPath": "/terms",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
+  "/sparkles-demo": {
+    "title": "Sparkles Demo｜Peace Biz",
+    "description": "UI demonstration page.",
+    "canonicalPath": "/sparkles-demo",
+    "robots": "noindex, nofollow",
+    "includeInPrerender": false,
+    "includeInSitemap": false
+  }
+}

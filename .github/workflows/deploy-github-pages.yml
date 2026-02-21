@@ -37,6 +37,9 @@ jobs:
           REACT_APP_CONTACT_API_URL: ${{ secrets.REACT_APP_CONTACT_API_URL || vars.REACT_APP_CONTACT_API_URL }}
           REACT_APP_WEB3FORMS_ACCESS_KEY: ${{ secrets.REACT_APP_WEB3FORMS_ACCESS_KEY || vars.REACT_APP_WEB3FORMS_ACCESS_KEY }}
 
+      - name: Verify generated SEO/AI artifacts are committed
+        run: git diff --exit-code -- public/sitemap.xml public/llms.txt public/ai-context.json
+
       - name: Upload static artifact
         uses: actions/upload-pages-artifact@v3
         with:

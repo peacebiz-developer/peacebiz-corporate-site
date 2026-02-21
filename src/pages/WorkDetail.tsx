@@ -13,9 +13,12 @@ import { cn } from '../utils/cn';
 import { applySeoMeta } from '../utils/seo';
 import { BASE_URL, ORGANIZATION_LOGO_URL, ORGANIZATION_NAME, SITE_NAME } from '../config/site';
 
+const toAbsoluteUrl = (url: string) => (/^https?:\/\//.test(url) ? url : `${BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`);
+
 const WorkDetail: React.FC = () => {
   const { slug = '' } = useParams();
   const work = useMemo(() => getWorkBySlug(slug), [slug]);
+  const imageUrl = useMemo(() => (work ? toAbsoluteUrl(work.img) : `${BASE_URL}/assets/images/brand/logo.png`), [work]);
 
   useLayoutEffect(() => {
     if (!work) {
@@ -31,8 +34,10 @@ const WorkDetail: React.FC = () => {
       title: `${work.title}｜${SITE_NAME}`,
       description: `${work.client} / ${categoryLabels[work.category]} / ${work.description}`.slice(0, 120),
       canonicalUrl: `${BASE_URL}/works/${work.slug}`,
+      imageUrl,
+      ogType: 'article',
     });
-  }, [work]);
+  }, [imageUrl, work]);
 
   const workLd = useMemo(() => {
     if (!work) return null;
@@ -41,7 +46,7 @@ const WorkDetail: React.FC = () => {
       '@type': 'CreativeWork',
       name: work.title,
       description: work.description,
-      image: [work.img],
+      image: [imageUrl],
       creator: {
         '@type': 'Organization',
         name: ORGANIZATION_NAME,
@@ -51,7 +56,7 @@ const WorkDetail: React.FC = () => {
       dateCreated: work.year,
       keywords: [categoryLabels[work.category], work.service || ''],
     };
-  }, [work]);
+  }, [imageUrl, work]);
 
   if (!work) {
     return (

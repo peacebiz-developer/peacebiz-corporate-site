@@ -11,9 +11,21 @@ const catColorMap: Record<string, string> = {
   Recruit: 'bg-brand-orange',
 };
 
+const toAbsoluteUrl = (url: string) => (/^https?:\/\//.test(url) ? url : `${BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`);
+const toIsoDate = (value: string) => {
+  const parts = value.split('.');
+  if (parts.length === 3) {
+    const [year, month, day] = parts;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+  return value;
+};
+
 const NewsDetail: React.FC = () => {
   const { slug = '' } = useParams();
   const news = useMemo(() => getNewsBySlug(slug), [slug]);
+  const imageUrl = useMemo(() => (news ? toAbsoluteUrl(news.img) : `${BASE_URL}/assets/images/brand/logo.png`), [news]);
+  const publishedDate = useMemo(() => (news ? toIsoDate(news.date) : ''), [news]);
 
   useLayoutEffect(() => {
     if (!news) {
@@ -29,8 +41,10 @@ const NewsDetail: React.FC = () => {
       title: `${news.title}｜${SITE_NAME}`,
       description: news.content.replace(/\s+/g, ' ').slice(0, 120),
       canonicalUrl: `${BASE_URL}/news/${news.slug}`,
+      imageUrl,
+      ogType: 'article',
     });
-  }, [news]);
+  }, [imageUrl, news]);
 
   const articleLd = useMemo(() => {
     if (!news) return null;
@@ -38,9 +52,9 @@ const NewsDetail: React.FC = () => {
       '@context': 'https://schema.org',
       '@type': 'NewsArticle',
       headline: news.title,
-      datePublished: news.date,
-      dateModified: news.date,
-      image: [news.img],
+      datePublished: publishedDate,
+      dateModified: publishedDate,
+      image: [imageUrl],
       author: {
         '@type': 'Organization',
         name: ORGANIZATION_NAME,
@@ -56,7 +70,7 @@ const NewsDetail: React.FC = () => {
       mainEntityOfPage: `${BASE_URL}/news/${news.slug}`,
       articleBody: news.content,
     };
-  }, [news]);
+  }, [imageUrl, news, publishedDate]);
 
   if (!news) {
     return (

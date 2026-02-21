@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-20T09:31:02.650Z",
+  "generatedAt": "2026-02-12T00:00:00.000Z",
   "site": {
     "name": "Peace Biz",
     "legalName": "株式会社ピース・ビズ",
@@ -27,7 +27,6 @@
     "sitemapRoutes": [
       "/",
       "/about",
-      "/company",
       "/services",
       "/services/it-solution",
       "/services/eco-solution",
@@ -57,7 +56,6 @@
     "canonicalUrls": [
       "https://www.peace-biz.com/",
       "https://www.peace-biz.com/about",
-      "https://www.peace-biz.com/company",
       "https://www.peace-biz.com/services",
       "https://www.peace-biz.com/services/it-solution",
       "https://www.peace-biz.com/services/eco-solution",
@@ -84,7 +82,17 @@
       "https://www.peace-biz.com/works/showcase-eco-pending-05",
       "https://www.peace-biz.com/works/showcase-office-pending-06"
     ],
-    "count": 28
+    "count": 27
+  },
+  "routeMeta": {
+    "source": "src/data/content/static-route-meta.json",
+    "aliasRoutes": [
+      "/company",
+      "/work"
+    ],
+    "noindexRoutes": [
+      "/sparkles-demo"
+    ]
   },
   "content": {
     "news": {

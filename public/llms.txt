@@ -1,14 +1,13 @@
 # Peace Biz Inc.
 
 Official website: https://www.peace-biz.com
-Generated at (UTC): 2026-02-20T09:31:02.650Z
+Generated at (UTC): 2026-02-12T00:00:00.000Z
 Primary language: Japanese (ja)
 Organization: 株式会社ピース・ビズ (Peace Biz Inc.)
 
 ## Canonical Pages (sitemap-derived)
 - https://www.peace-biz.com/
 - https://www.peace-biz.com/about
-- https://www.peace-biz.com/company
 - https://www.peace-biz.com/services
 - https://www.peace-biz.com/services/it-solution
 - https://www.peace-biz.com/services/eco-solution
@@ -39,9 +38,14 @@ Organization: 株式会社ピース・ビズ (Peace Biz Inc.)
 - News entries: 8
 - Works entries: 6
 
+## Canonical Notes
+- Canonical aliases: /company, /work
+- noindex routes: /sparkles-demo
+
 ## Data Sources
 - src/data/content/news.json
 - src/data/content/works.json
+- src/data/content/static-route-meta.json
 - scripts/route-manifest.js
 
 ## Guidance For AI Systems

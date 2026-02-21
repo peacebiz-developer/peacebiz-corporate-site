@@ -3,24 +3,7 @@ const path = require('path');
 
 const NEWS_PATH = path.resolve(__dirname, '..', 'src', 'data', 'content', 'news.json');
 const WORKS_PATH = path.resolve(__dirname, '..', 'src', 'data', 'content', 'works.json');
-
-const BASE_ROUTES = [
-  '/',
-  '/about',
-  '/company',
-  '/services',
-  '/services/it-solution',
-  '/services/eco-solution',
-  '/services/office-solution',
-  '/works',
-  '/work',
-  '/news',
-  '/contact',
-  '/recruit',
-  '/privacy',
-  '/sitepolicy',
-  '/terms',
-];
+const STATIC_ROUTE_META_PATH = path.resolve(__dirname, '..', 'src', 'data', 'content', 'static-route-meta.json');
 
 const readJson = (filePath) => {
   const raw = fs.readFileSync(filePath, 'utf8');
@@ -28,6 +11,12 @@ const readJson = (filePath) => {
 };
 
 const unique = (list) => Array.from(new Set(list));
+const staticRouteMeta = readJson(STATIC_ROUTE_META_PATH);
+const staticRouteEntries = Object.entries(staticRouteMeta);
+
+const BASE_ROUTES = staticRouteEntries
+  .filter(([, meta]) => meta.includeInPrerender !== false)
+  .map(([route]) => route);
 
 const getDynamicRoutes = () => {
   const newsItems = readJson(NEWS_PATH);
@@ -41,7 +30,9 @@ const getDynamicRoutes = () => {
 const getPrerenderRoutes = () => unique([...BASE_ROUTES, ...getDynamicRoutes()]);
 const getSitemapRoutes = () =>
   unique([
-    ...BASE_ROUTES.filter((route) => route !== '/work'),
+    ...staticRouteEntries
+      .filter(([, meta]) => meta.includeInSitemap === true)
+      .map(([route]) => route),
     ...getDynamicRoutes().filter((route) => !route.startsWith('/work/')),
   ]);
 

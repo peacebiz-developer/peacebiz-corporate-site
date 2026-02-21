@@ -45,9 +45,10 @@
   },
   "scripts": {
     "start": "node scripts/generate-ai-context.js && set HOST=0.0.0.0&& react-scripts start",
-    "build": "node scripts/generate-ai-context.js && node scripts/generate-sitemap.js && react-scripts build && node scripts/generate-static-routes.js && node scripts/generate-legacy-asset-aliases.js",
+    "build": "node scripts/generate-ai-context.js && node scripts/generate-sitemap.js && node scripts/verify-seo-ai-consistency.js && react-scripts build && node scripts/generate-static-routes.js && node scripts/generate-legacy-asset-aliases.js",
     "postbuild": "node scripts/run-react-snap.js",
     "sync:ai-context": "node scripts/generate-ai-context.js",
+    "verify:seo": "node scripts/verify-seo-ai-consistency.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
