@@ -218,12 +218,13 @@ const WebGLServiceSlider: React.FC<Props> = ({ sections }) => {
         serviceListEl.innerHTML = `<div class="wss-service-list">${s.items
           .map((it) => {
             const externalUrl = sanitizeExternalUrl(it.url);
+            const itemPath = it.path ? escapeHtml(it.path) : escapeHtml(safePath);
             const safeHoverLabel = escapeHtml(it.labelEn || it.label);
             const safeLabel = escapeHtml(it.label);
             if (externalUrl) {
               return `<a class="wss-service-item" href="${escapeHtml(externalUrl)}" target="_blank" rel="noopener noreferrer"><div class="wss-rolling-text"><div class="wss-rolling-inner"><div class="wss-rolling-line"><span class="wss-service-label">${safeLabel}</span></div><div class="wss-rolling-line"><span class="wss-service-label wss-label-hover">${safeHoverLabel}</span></div></div></div><svg class="wss-service-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
             }
-            return `<a class="wss-service-item" href="${escapeHtml(safePath)}" data-path="${escapeHtml(safePath)}"><div class="wss-rolling-text"><div class="wss-rolling-inner"><div class="wss-rolling-line"><span class="wss-service-label">${safeLabel}</span></div><div class="wss-rolling-line"><span class="wss-service-label wss-label-hover">${safeHoverLabel}</span></div></div></div><svg class="wss-service-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
+            return `<a class="wss-service-item" href="${itemPath}" data-path="${itemPath}"><div class="wss-rolling-text"><div class="wss-rolling-inner"><div class="wss-rolling-line"><span class="wss-service-label">${safeLabel}</span></div><div class="wss-rolling-line"><span class="wss-service-label wss-label-hover">${safeHoverLabel}</span></div></div></div><svg class="wss-service-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>`;
           })
           .join('')}</div>`;
 

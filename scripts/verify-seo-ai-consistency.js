@@ -5,6 +5,7 @@ const { BASE_ROUTES, getSitemapRoutes } = require('./route-manifest');
 const SITE_URL = 'https://www.peace-biz.com';
 const STATIC_ROUTE_META_PATH = path.resolve(__dirname, '..', 'src', 'data', 'content', 'static-route-meta.json');
 const APP_PATH = path.resolve(__dirname, '..', 'src', 'App.tsx');
+const ROUTES_CONFIG_PATH = path.resolve(__dirname, '..', 'src', 'config', 'routes.ts');
 const SITEMAP_PATH = path.resolve(__dirname, '..', 'public', 'sitemap.xml');
 const LLM_PATH = path.resolve(__dirname, '..', 'public', 'llms.txt');
 const AI_CONTEXT_PATH = path.resolve(__dirname, '..', 'public', 'ai-context.json');
@@ -31,14 +32,40 @@ const compareSets = (label, expected, actual, failures) => {
   }
 };
 
-const extractAppRoutes = (appSource) => {
+const extractRoutesConfig = (routesConfigSource) => {
+  const routes = {};
+  const pairRegex = /^\s*([A-Za-z0-9_]+):\s*'([^']+)'/gm;
+  let match = pairRegex.exec(routesConfigSource);
+  while (match) {
+    routes[match[1]] = match[2];
+    match = pairRegex.exec(routesConfigSource);
+  }
+  return routes;
+};
+
+const extractAppRoutes = (appSource, routesConfig, failures) => {
   const routes = [];
-  const routeRegex = /<Route\s+path="([^"]+)"/g;
-  let match = routeRegex.exec(appSource);
+
+  const literalRouteRegex = /<Route\s+path="([^"]+)"/g;
+  let match = literalRouteRegex.exec(appSource);
   while (match) {
     routes.push(match[1]);
-    match = routeRegex.exec(appSource);
+    match = literalRouteRegex.exec(appSource);
   }
+
+  const constantRouteRegex = /<Route\s+path=\{ROUTES\.([A-Za-z0-9_]+)\}/g;
+  match = constantRouteRegex.exec(appSource);
+  while (match) {
+    const routeKey = match[1];
+    const routePath = routesConfig[routeKey];
+    if (!routePath) {
+      failures.push(`Unknown ROUTES key used in App.tsx: ${routeKey}`);
+    } else {
+      routes.push(routePath);
+    }
+    match = constantRouteRegex.exec(appSource);
+  }
+
   return unique(routes);
 };
 
@@ -72,6 +99,7 @@ const verify = () => {
   const failures = [];
 
   const staticRouteMeta = readJson(STATIC_ROUTE_META_PATH);
+  const routesConfig = extractRoutesConfig(readText(ROUTES_CONFIG_PATH));
   const staticEntries = Object.entries(staticRouteMeta);
   const staticRoutes = staticEntries.map(([route]) => route);
 
@@ -96,6 +124,16 @@ const verify = () => {
     if (!meta.canonicalPath.startsWith('/')) {
       failures.push(`canonicalPath must start with "/": ${route} -> ${meta.canonicalPath}`);
     }
+    if (
+      typeof meta.ogImagePath === 'string' &&
+      !meta.ogImagePath.startsWith('/') &&
+      !/^https?:\/\//.test(meta.ogImagePath)
+    ) {
+      failures.push(`ogImagePath must start with "/" or "http(s)://": ${route} -> ${meta.ogImagePath}`);
+    }
+    if (meta.includeInSitemap === true && typeof meta.robots === 'string' && /noindex/i.test(meta.robots)) {
+      failures.push(`Sitemap route cannot be noindex: ${route}`);
+    }
     if (meta.includeInSitemap === true && normalizeRoute(meta.canonicalPath) !== normalizeRoute(route)) {
       failures.push(`Sitemap route must be self-canonical: ${route} -> ${meta.canonicalPath}`);
     }
@@ -113,7 +151,7 @@ const verify = () => {
     failures
   );
 
-  const appRoutes = extractAppRoutes(readText(APP_PATH));
+  const appRoutes = extractAppRoutes(readText(APP_PATH), routesConfig, failures);
   compareSets('App static routes', unique(staticRoutes), unique(appRoutes.filter((route) => !route.includes(':'))), failures);
 
   ['/news/:slug', '/works/:slug', '/work/:slug'].forEach((dynamicRoute) => {

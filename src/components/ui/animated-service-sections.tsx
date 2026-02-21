@@ -13,6 +13,7 @@ interface ServiceItem {
   label: string;
   labelEn?: string;
   url?: string;
+  path?: string;
 }
 
 export interface ServiceSectionData {

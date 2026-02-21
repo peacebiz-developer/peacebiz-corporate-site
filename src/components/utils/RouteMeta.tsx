@@ -1,28 +1,14 @@
 import { type FC, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { applySeoMeta } from '../../utils/seo';
-import { BASE_URL } from '../../config/site';
-import routeMetaJson from '../../data/content/static-route-meta.json';
+import {
+  DEFAULT_STATIC_ROUTE_META,
+  STATIC_ROUTE_META_BY_PATH,
+  toAbsoluteUrl,
+  toCanonicalUrl,
+} from '../../config/staticRouteMeta';
 
-type RouteMetaConfig = {
-  title: string;
-  description: string;
-  canonicalPath: string;
-  robots?: string;
-  includeInPrerender?: boolean;
-  includeInSitemap?: boolean;
-};
-
-const DEFAULT_META: RouteMetaConfig = {
-  title: '株式会社ピース・ビズ｜店舗・オフィスの空間を設計する',
-  description:
-    '業務用空調、デジタルサイネージ「Prime Sign」、ICT整備まで。株式会社ピース・ビズは店舗・オフィスの環境を設計し、導入から運用まで一貫して支援します。',
-  canonicalPath: '/',
-};
-
-const META_BY_PATH: Record<string, RouteMetaConfig> = routeMetaJson;
-
-const resolveMeta = (pathname: string): RouteMetaConfig => META_BY_PATH[pathname] || DEFAULT_META;
+const resolveMeta = (pathname: string) => STATIC_ROUTE_META_BY_PATH[pathname] || DEFAULT_STATIC_ROUTE_META;
 const normalizePathname = (pathname: string): string =>
   pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
 
@@ -39,12 +25,13 @@ const RouteMeta: FC = () => {
       return;
     }
     const meta = resolveMeta(normalizedPath);
-    const canonicalUrl = `${BASE_URL}${meta.canonicalPath}`.replace(/\/+$/, '') || BASE_URL;
+    const canonicalUrl = toCanonicalUrl(normalizedPath);
     applySeoMeta({
       title: meta.title,
       description: meta.description,
       canonicalUrl,
       robots: meta.robots,
+      imageUrl: meta.ogImagePath ? toAbsoluteUrl(meta.ogImagePath) : undefined,
     });
   }, [location.pathname]);
 

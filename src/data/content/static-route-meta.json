@@ -41,6 +41,14 @@
     "includeInPrerender": true,
     "includeInSitemap": true
   },
+  "/services/eco-solution/commercial-aircon": {
+    "title": "業務用エアコン更新｜Eco Solution｜Peace Biz",
+    "description": "店舗・オフィスの業務用エアコン更新を、現地調査から機器選定・施工・フロン回収まで一括対応。省エネ・快適性・法令対応を整え、最適な更新プランをご提案します。",
+    "canonicalPath": "/services/eco-solution/commercial-aircon",
+    "ogImagePath": "/assets/images/services/air-conditioner.webp",
+    "includeInPrerender": true,
+    "includeInSitemap": true
+  },
   "/services/office-solution": {
     "title": "Office Solution｜Peace Biz",
     "description": "オフィスサプライ・ネット回線・モバイル端末などOfficeソリューションをご紹介します。",

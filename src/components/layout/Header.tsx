@@ -184,9 +184,9 @@ const Header: React.FC = () => {
                 external: true,
               },
               {
-                title: '業務用エアコン',
-                description: '省エネ空調ソリューション',
-                to: '/#top-featured',
+                title: '業務用エアコン更新',
+                description: '現地調査・施工・フロン回収まで一括対応',
+                to: '/services/eco-solution/commercial-aircon',
                 image: assetPaths.services.airConditioner,
               },
             ],

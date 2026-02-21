@@ -14,6 +14,8 @@
   - `postbuild` = `scripts/run-react-snap.js`（CI時は `--no-sandbox` 等を付与）
 - Dynamic route source: `src/data/content/news.json`, `src/data/content/works.json`（`scripts/route-manifest.js`）
 - Static route/meta source: `src/data/content/static-route-meta.json`（`src/components/utils/RouteMeta.tsx`, `scripts/route-manifest.js`）
+- Route path constants: `src/config/routes.ts`（`App.tsx` と主要導線で使用）
+- Static meta helper: `src/config/staticRouteMeta.ts`（canonical/OG URL 解決の共通処理）
 - CI guardrail: build後に `public/sitemap.xml` / `public/llms.txt` / `public/ai-context.json` の未コミット差分があるとデプロイを停止
 - Main asset locations:
   - `public/`（favicon・`robots.txt`・`sitemap.xml`・`404.html`・AI参照ファイル）
@@ -71,7 +73,9 @@
 ## SEO & Routing Safety
 - ルーティング変更時は次をセットで確認する:
   - `src/App.tsx`（Route定義）
+  - `src/config/routes.ts`（パス定数）
   - `src/data/content/static-route-meta.json`（静的ページ canonical / robots / sitemap/prerender 対象）
+  - `src/config/staticRouteMeta.ts`（RouteMeta/ページ個別JSON-LDで使う canonical 解決）
   - `src/components/utils/RouteMeta.tsx`（静的ページメタ）
   - `src/pages/NewsDetail.tsx` / `src/pages/WorkDetail.tsx`（詳細ページメタ）
   - `scripts/route-manifest.js`（プリレンダー/サイトマップ対象）

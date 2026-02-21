@@ -1,7 +1,7 @@
 # Peace Biz Inc.
 
 Official website: https://www.peace-biz.com
-Generated at (UTC): 2026-02-20T00:00:00.000Z
+Generated at (UTC): 2026-02-25T00:00:00.000Z
 Primary language: Japanese (ja)
 Organization: 株式会社ピース・ビズ (Peace Biz Inc.)
 
@@ -11,6 +11,7 @@ Organization: 株式会社ピース・ビズ (Peace Biz Inc.)
 - https://www.peace-biz.com/services
 - https://www.peace-biz.com/services/it-solution
 - https://www.peace-biz.com/services/eco-solution
+- https://www.peace-biz.com/services/eco-solution/commercial-aircon
 - https://www.peace-biz.com/services/office-solution
 - https://www.peace-biz.com/works
 - https://www.peace-biz.com/news
@@ -19,13 +20,17 @@ Organization: 株式会社ピース・ビズ (Peace Biz Inc.)
 - https://www.peace-biz.com/privacy
 - https://www.peace-biz.com/sitepolicy
 - https://www.peace-biz.com/terms
+- https://www.peace-biz.com/news/dx-contact-flow-improvement-2026-02-25
+- https://www.peace-biz.com/news/commercial-aircon-page-open-2026-02-21
 - https://www.peace-biz.com/news/corporate-site-renewal-2026-02-20
+- https://www.peace-biz.com/news/year-end-holidays-2025-12-20
+- https://www.peace-biz.com/news/sendai-office-relocation-enspace-2025-12-01
+- https://www.peace-biz.com/news/ai-licenses-for-all-employees-2025-09-30
 - https://www.peace-biz.com/news/prime-sign-launch-2025-01-15
 - https://www.peace-biz.com/news/new-graduate-entry-2024-02-01
 - https://www.peace-biz.com/news/hvac-projects-3500-2023-06-01
+- https://www.peace-biz.com/news/app-800-stores-2022-12-01
 - https://www.peace-biz.com/news/app-service-launch-2022-02-01
-- https://www.peace-biz.com/news/website-renewal-2020-09-15
-- https://www.peace-biz.com/news/sendai-office-relocation-2020-07-01
 - https://www.peace-biz.com/news/recruit-open-2020-03-01
 - https://www.peace-biz.com/works/showcase-it-pending-01
 - https://www.peace-biz.com/works/showcase-eco-pending-02
@@ -35,7 +40,7 @@ Organization: 株式会社ピース・ビズ (Peace Biz Inc.)
 - https://www.peace-biz.com/works/showcase-office-pending-06
 
 ## Dynamic Content
-- News entries: 8
+- News entries: 12
 - Works entries: 6
 
 ## Canonical Notes

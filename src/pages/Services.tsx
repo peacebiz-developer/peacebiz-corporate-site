@@ -30,7 +30,7 @@ const Services: React.FC = () => {
       titleBase: 'Solution',
       desc: '業務用エアコン、太陽光発電システム、新電力。コスト削減と環境貢献を両立する最適なプランをご提案。',
       items: [
-        { label: '業務用空調機器', labelEn: 'Commercial HVAC' },
+        { label: '業務用空調機器', labelEn: 'Commercial HVAC', path: '/services/eco-solution/commercial-aircon' },
         { label: '厨房機器', labelEn: 'Kitchen Equipment' },
         { label: '太陽光発電システム', labelEn: 'Solar Power System' },
         { label: '蓄電池', labelEn: 'Battery Storage' },

@@ -14,6 +14,7 @@ import ScrollToTop from './components/utils/ScrollToTop';
 import RouteMeta from './components/utils/RouteMeta';
 
 import { GridBackground } from './components/layout/GridBackground';
+import { ROUTES } from './config/routes';
 
 const Top = lazy(() => import('./pages/Top'));
 const About = lazy(() => import('./pages/About'));
@@ -21,6 +22,7 @@ const Services = lazy(() => import('./pages/Services'));
 const ITSolution = lazy(() => import('./pages/services/ITSolution'));
 const EcoSolution = lazy(() => import('./pages/services/EcoSolution'));
 const OfficeSolution = lazy(() => import('./pages/services/OfficeSolution'));
+const CommercialAircon = lazy(() => import('./pages/services/CommercialAircon'));
 const Works = lazy(() => import('./pages/Works'));
 const WorkDetail = lazy(() => import('./pages/WorkDetail'));
 const News = lazy(() => import('./pages/News'));
@@ -72,25 +74,26 @@ const App: React.FC = () => {
           <Suspense fallback={null}>
             <AnimatePresence mode="wait">
               <Routes>
-                <Route path="/" element={routeWithTransition(<Top />, false)} />
-                <Route path="/about" element={routeWithTransition(<About />, false)} />
-                <Route path="/company" element={routeWithTransition(<About />, false)} />
-                <Route path="/services" element={routeWithTransition(<Services />, false)} />
-                <Route path="/services/it-solution" element={routeWithTransition(<ITSolution />, false)} />
-                <Route path="/services/eco-solution" element={routeWithTransition(<EcoSolution />, false)} />
-                <Route path="/services/office-solution" element={routeWithTransition(<OfficeSolution />, false)} />
-                <Route path="/works" element={routeWithTransition(<Works />)} />
-                <Route path="/works/:slug" element={routeWithTransition(<WorkDetail />)} />
-                <Route path="/work" element={routeWithTransition(<Works />)} />
-                <Route path="/work/:slug" element={routeWithTransition(<WorkDetail />)} />
-                <Route path="/news" element={routeWithTransition(<News />)} />
-                <Route path="/news/:slug" element={routeWithTransition(<NewsDetail />)} />
-                <Route path="/contact" element={routeWithTransition(<Contact />, false)} />
-                <Route path="/recruit" element={routeWithTransition(<Recruit />, false)} />
-                <Route path="/privacy" element={routeWithTransition(<Privacy />)} />
-                <Route path="/sitepolicy" element={routeWithTransition(<SitePolicy />)} />
-                <Route path="/terms" element={routeWithTransition(<SitePolicy />)} />
-                <Route path="/sparkles-demo" element={routeWithTransition(<SparklesDemo />, false)} />
+                <Route path={ROUTES.home} element={routeWithTransition(<Top />, false)} />
+                <Route path={ROUTES.about} element={routeWithTransition(<About />, false)} />
+                <Route path={ROUTES.company} element={routeWithTransition(<About />, false)} />
+                <Route path={ROUTES.services} element={routeWithTransition(<Services />, false)} />
+                <Route path={ROUTES.servicesIt} element={routeWithTransition(<ITSolution />, false)} />
+                <Route path={ROUTES.servicesEco} element={routeWithTransition(<EcoSolution />, false)} />
+                <Route path={ROUTES.servicesOffice} element={routeWithTransition(<OfficeSolution />, false)} />
+                <Route path={ROUTES.servicesEcoCommercialAircon} element={routeWithTransition(<CommercialAircon />, false)} />
+                <Route path={ROUTES.works} element={routeWithTransition(<Works />)} />
+                <Route path={ROUTES.worksDetail} element={routeWithTransition(<WorkDetail />)} />
+                <Route path={ROUTES.work} element={routeWithTransition(<Works />)} />
+                <Route path={ROUTES.workDetail} element={routeWithTransition(<WorkDetail />)} />
+                <Route path={ROUTES.news} element={routeWithTransition(<News />)} />
+                <Route path={ROUTES.newsDetail} element={routeWithTransition(<NewsDetail />)} />
+                <Route path={ROUTES.contact} element={routeWithTransition(<Contact />, false)} />
+                <Route path={ROUTES.recruit} element={routeWithTransition(<Recruit />, false)} />
+                <Route path={ROUTES.privacy} element={routeWithTransition(<Privacy />)} />
+                <Route path={ROUTES.sitePolicy} element={routeWithTransition(<SitePolicy />)} />
+                <Route path={ROUTES.terms} element={routeWithTransition(<SitePolicy />)} />
+                <Route path={ROUTES.sparklesDemo} element={routeWithTransition(<SparklesDemo />, false)} />
               </Routes>
             </AnimatePresence>
           </Suspense>

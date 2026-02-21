@@ -6,6 +6,7 @@ import { MaskTextReveal } from '../../components/ui/MaskTextReveal';
 import { MagneticButton } from '../../components/ui/MagneticButton';
 import { GlowingEffect } from '../../components/ui/glowing-effect';
 import { assetPaths } from '../../config/assets';
+import { ROUTES } from '../../config/routes';
 
 /* ─── Shared animation variant ─── */
 const fadeInUp = {
@@ -26,6 +27,7 @@ const services = [
         desc: '最新の業務用エアコンや厨房機器の入れ替えで、消費電力を抑制し環境効果を最大化。施設全体のエネルギー消費を可視化し、最も効果的な改善ポイントを特定。無駄のない投資で、大きなリターンを生み出します。',
         img: assetPaths.services.airConditioner,
         highlights: ['業務用エアコン入替', '厨房機器', 'エネルギー可視化'],
+        link: ROUTES.servicesEcoCommercialAircon,
     },
     {
         num: '02',
@@ -49,7 +51,7 @@ const lineupItems = [
     { label: '産業用太陽光発電システム', tag: 'Industry' },
     { label: '住宅用太陽光発電システム', tag: 'Solar' },
     { label: '蓄電池／V2H', tag: 'Battery' },
-    { label: '業務用エアコン更新', tag: 'HVAC' },
+    { label: '業務用エアコン更新', tag: 'HVAC', link: ROUTES.servicesEcoCommercialAircon },
     { label: '厨房機器更新', tag: 'Kitchen' },
     { label: '新電力サービス', tag: 'Power' },
     { label: 'キュービクル保安点検', tag: 'Maintenance' },
@@ -433,10 +435,10 @@ const EcoSolution: React.FC = () => {
 
                                             {/* Link */}
                                             <Link
-                                                to="/contact"
+                                                to={svc.link || ROUTES.contact}
                                                 className="inline-flex items-center gap-2 text-xs md:text-sm font-bold tracking-[0.15em] uppercase text-brand-green hover:translate-x-2 transition-transform duration-300"
                                             >
-                                                お問い合わせ <ArrowUpRight className="w-4 h-4" />
+                                                {svc.link ? '詳しく見る' : 'お問い合わせ'} <ArrowUpRight className="w-4 h-4" />
                                             </Link>
                                         </motion.div>
                                     </motion.div>
@@ -489,38 +491,32 @@ const EcoSolution: React.FC = () => {
 
                     {/* List items */}
                     <div className="border-t border-black/10 dark:border-white/10">
-                        {lineupItems.map((item, i) => (
-                            <motion.div
-                                key={i}
-                                initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true }}
-                                custom={i}
-                                variants={fadeInUp}
-                                className="group flex items-center py-6 md:py-8 border-b border-black/10 dark:border-white/10 hover:bg-white dark:hover:bg-white/[0.02] transition-colors duration-300 cursor-default -mx-4 md:-mx-6 px-4 md:px-6"
-                            >
-                                {/* Number */}
-                                <span className="text-[10px] md:text-xs font-mono text-gray-300 dark:text-gray-600 w-8 md:w-12 shrink-0 group-hover:text-brand-green transition-colors duration-300">
-                                    0{i + 1}
-                                </span>
-
-                                {/* Icon */}
-                                <CheckCircle2 className="text-brand-green/40 group-hover:text-brand-green mr-3 md:mr-5 w-4 h-4 md:w-5 md:h-5 shrink-0 transition-colors duration-300" />
-
-                                {/* Label */}
-                                <span className="text-base md:text-xl font-bold flex-1 group-hover:translate-x-2 transition-transform duration-300">
-                                    {item.label}
-                                </span>
-
-                                {/* Tag */}
-                                <span className="hidden md:inline text-[10px] font-mono tracking-widest text-gray-300 dark:text-gray-600 uppercase group-hover:text-brand-green/60 transition-colors duration-300">
-                                    {item.tag}
-                                </span>
-
-                                {/* Arrow */}
-                                <ArrowUpRight className="w-4 h-4 text-gray-200 dark:text-gray-700 group-hover:text-brand-green ml-4 opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                            </motion.div>
-                        ))}
+                        {lineupItems.map((item, i) => {
+                            const row = (
+                                <motion.div
+                                    key={i}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    viewport={{ once: true }}
+                                    custom={i}
+                                    variants={fadeInUp}
+                                    className={`group flex items-center py-6 md:py-8 border-b border-black/10 dark:border-white/10 hover:bg-white dark:hover:bg-white/[0.02] transition-colors duration-300 -mx-4 md:-mx-6 px-4 md:px-6 ${item.link ? 'cursor-pointer' : 'cursor-default'}`}
+                                >
+                                    <span className="text-[10px] md:text-xs font-mono text-gray-300 dark:text-gray-600 w-8 md:w-12 shrink-0 group-hover:text-brand-green transition-colors duration-300">
+                                        0{i + 1}
+                                    </span>
+                                    <CheckCircle2 className="text-brand-green/40 group-hover:text-brand-green mr-3 md:mr-5 w-4 h-4 md:w-5 md:h-5 shrink-0 transition-colors duration-300" />
+                                    <span className="text-base md:text-xl font-bold flex-1 group-hover:translate-x-2 transition-transform duration-300">
+                                        {item.label}
+                                    </span>
+                                    <span className="hidden md:inline text-[10px] font-mono tracking-widest text-gray-300 dark:text-gray-600 uppercase group-hover:text-brand-green/60 transition-colors duration-300">
+                                        {item.tag}
+                                    </span>
+                                    <ArrowUpRight className="w-4 h-4 text-gray-200 dark:text-gray-700 group-hover:text-brand-green ml-4 opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                                </motion.div>
+                            );
+                            return item.link ? <Link key={i} to={item.link}>{row}</Link> : row;
+                        })}
                     </div>
                 </div>
             </section>
@@ -573,7 +569,7 @@ const EcoSolution: React.FC = () => {
                         </p>
                         <MagneticButton>
                             <Link
-                                to="/contact"
+                                to={ROUTES.contact}
                                 className="inline-flex touch-manipulation items-center justify-center bg-white text-brand-green font-bold text-base md:text-lg px-10 md:px-14 py-7 md:py-8 rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105"
                             >
                                 CONTACT US
