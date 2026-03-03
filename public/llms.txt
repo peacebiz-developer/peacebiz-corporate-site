@@ -19,7 +19,6 @@ Organization: 株式会社ピース・ビズ (Peace Biz Inc.)
 - https://peace-biz.com/recruit
 - https://peace-biz.com/privacy
 - https://peace-biz.com/sitepolicy
-- https://peace-biz.com/terms
 - https://peace-biz.com/news/corporate-site-renewal-2026-02-20
 - https://peace-biz.com/news/year-end-holidays-2025-12-20
 - https://peace-biz.com/news/sendai-office-relocation-enspace-2025-12-01
@@ -42,8 +41,8 @@ Organization: 株式会社ピース・ビズ (Peace Biz Inc.)
 - Works entries: 6
 
 ## Canonical Notes
-- Canonical aliases: /company, /work
-- noindex routes: /sparkles-demo
+- Canonical aliases: /company, /work, /terms
+- noindex routes: /terms, /sparkles-demo
 
 ## Data Sources
 - src/data/content/news.json

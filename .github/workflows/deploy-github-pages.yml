@@ -34,6 +34,8 @@ jobs:
       - name: Build
         run: CI=false npm run build
         env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "1"
+          PUPPETEER_EXECUTABLE_PATH: "/usr/bin/google-chrome"
           REACT_APP_CONTACT_API_URL: ${{ secrets.REACT_APP_CONTACT_API_URL || vars.REACT_APP_CONTACT_API_URL }}
           REACT_APP_WEB3FORMS_ACCESS_KEY: ${{ secrets.REACT_APP_WEB3FORMS_ACCESS_KEY || vars.REACT_APP_WEB3FORMS_ACCESS_KEY }}
 

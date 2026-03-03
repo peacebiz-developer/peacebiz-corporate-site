@@ -39,7 +39,6 @@
       "/recruit",
       "/privacy",
       "/sitepolicy",
-      "/terms",
       "/news/corporate-site-renewal-2026-02-20",
       "/news/year-end-holidays-2025-12-20",
       "/news/sendai-office-relocation-enspace-2025-12-01",
@@ -71,7 +70,6 @@
       "https://peace-biz.com/recruit",
       "https://peace-biz.com/privacy",
       "https://peace-biz.com/sitepolicy",
-      "https://peace-biz.com/terms",
       "https://peace-biz.com/news/corporate-site-renewal-2026-02-20",
       "https://peace-biz.com/news/year-end-holidays-2025-12-20",
       "https://peace-biz.com/news/sendai-office-relocation-enspace-2025-12-01",
@@ -89,15 +87,17 @@
       "https://peace-biz.com/works/showcase-eco-pending-05",
       "https://peace-biz.com/works/showcase-office-pending-06"
     ],
-    "count": 30
+    "count": 29
   },
   "routeMeta": {
     "source": "src/data/content/static-route-meta.json",
     "aliasRoutes": [
       "/company",
-      "/work"
+      "/work",
+      "/terms"
     ],
     "noindexRoutes": [
+      "/terms",
       "/sparkles-demo"
     ]
   },

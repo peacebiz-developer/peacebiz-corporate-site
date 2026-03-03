@@ -108,9 +108,10 @@
   "/terms": {
     "title": "利用規約｜Peace Biz",
     "description": "株式会社ピース・ビズのサイト利用規約です。",
-    "canonicalPath": "/terms",
+    "canonicalPath": "/sitepolicy",
+    "robots": "noindex, follow",
     "includeInPrerender": true,
-    "includeInSitemap": true
+    "includeInSitemap": false
   },
   "/sparkles-demo": {
     "title": "Sparkles Demo｜Peace Biz",
