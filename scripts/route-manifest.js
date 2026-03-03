@@ -28,6 +28,23 @@ const getDynamicRoutes = () => {
 };
 
 const getPrerenderRoutes = () => unique([...BASE_ROUTES, ...getDynamicRoutes()]);
+
+const ensureTrailingSlash = (route) =>
+  route === '/' ? '/' : route.endsWith('/') ? route : `${route}/`;
+
+const getAliasRedirectTarget = (route) => {
+  if (route.startsWith('/work/')) {
+    return ensureTrailingSlash(route.replace('/work/', '/works/'));
+  }
+  const meta = staticRouteMeta[route];
+  if (!meta || !meta.canonicalPath) return null;
+  if (meta.canonicalPath !== route) return ensureTrailingSlash(meta.canonicalPath);
+  return null;
+};
+
+const getPrerenderRoutesForSnap = () =>
+  getPrerenderRoutes().filter((route) => !getAliasRedirectTarget(route));
+
 const getSitemapRoutes = () =>
   unique([
     ...staticRouteEntries
@@ -40,5 +57,7 @@ module.exports = {
   BASE_ROUTES,
   getDynamicRoutes,
   getPrerenderRoutes,
+  getPrerenderRoutesForSnap,
+  getAliasRedirectTarget,
   getSitemapRoutes,
 };

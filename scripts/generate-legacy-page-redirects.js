@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { createRedirectHtml } = require('./utils/createRedirectHtml');
 
 const buildDir = path.resolve(__dirname, '..', 'build');
 
@@ -21,22 +22,6 @@ const legacyRedirectMap = {
   'thanks.php': '/contact/?thanks=1',
   'mailform/send.php': '/contact/',
 };
-
-const createRedirectHtml = (targetPath) => `<!doctype html>
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="refresh" content="0; url=${targetPath}" />
-    <meta name="robots" content="noindex, follow" />
-    <link rel="canonical" href="https://peace-biz.com${targetPath}" />
-    <title>Redirecting...</title>
-    <script>
-      window.location.replace(${JSON.stringify(targetPath)});
-    </script>
-  </head>
-  <body></body>
-</html>
-`;
 
 let generatedCount = 0;
 

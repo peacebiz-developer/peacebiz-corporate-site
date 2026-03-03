@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { run, defaultOptions } = require('react-snap');
-const { getPrerenderRoutes } = require('./route-manifest');
+const { getPrerenderRoutesForSnap } = require('./route-manifest');
 
 const SNAP_ENTRY_PATH = path.resolve(process.cwd(), 'build', '200.html');
 
@@ -12,7 +12,7 @@ const removeSnapEntryIfExists = () => {
 };
 
 const execute = async () => {
-  const include = getPrerenderRoutes();
+  const include = getPrerenderRoutesForSnap();
   const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
   const configuredPort = Number.parseInt(process.env.REACT_SNAP_PORT || '', 10);
   const defaultPortCandidates = [45678, 45679, 45680, 45681, 45682];
